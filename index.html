@@ -410,7 +410,7 @@
 </head>
 <body>
 
-<div class="edit-banner">✏️ 編輯模式 — 點擊任何文字即可修改 · 修改完成後可下載／列印</div>
+<div class="edit-banner">✏️ 編輯模式 — 點擊任何文字即可修改 · 修改完成後可下載 .pptx</div>
 
 <div class="topbar">
   <div class="brand"><div class="logo">A</div>Apple Shop 小教室專案</div>
@@ -425,7 +425,6 @@
     <button class="btn ghost" onclick="openPosterModal()" title="依當次選取主題產生宣傳海報">📣 宣傳海報</button>
     <button class="btn ghost" onclick="openSocialModal()" title="依當次選取主題產生社群開課文案">✍️ 社群文案</button>
     <button class="btn ghost" onclick="toggleEditMode()" id="editBtn" disabled>✏️ 編輯</button>
-    <button class="btn ghost" onclick="printAllSlides()">列印 / PDF</button>
     <button class="btn ghost" onclick="downloadPptx()" id="pptxBtn" disabled>📥 下載 .pptx</button>
     <button class="btn" onclick="generate()">生成簡報</button>
   </div>
@@ -699,7 +698,7 @@
     <div class="modal-hd">
       <div>
         <h2>📣 開課宣傳海報</h2>
-        <div class="modal-sub">依當次選取的主題自動生成。可存成社群圖片或列印張貼。</div>
+        <div class="modal-sub">依當次選取的主題自動生成。可存成社群圖片或 A4 海報張貼。</div>
       </div>
       <button class="modal-close" onclick="closeModal('posterModal')">✕</button>
     </div>
@@ -726,9 +725,8 @@
         <button class="copy-btn" onclick="renderPoster()">🔄 更新海報</button>
         <button class="copy-btn" style="background:#8a6d3b" onclick="resetPosterEdits()" title="清除手動修改的文字，回到自動產生的內容">↩︎ 還原文字</button>
         <button class="copy-btn" style="background:var(--green)" onclick="downloadPosterImage()">📥 存成圖片</button>
-        <button class="copy-btn" style="background:#444" onclick="printPoster()">🖨 列印</button>
       </div>
-      <div class="hint-box" style="margin:0 0 12px">✏️ <b>海報上的文字可直接點擊修改</b>（標題、主題、報名方式等）。改完按「📥 存成圖片」或「🖨 列印」就會存成您編輯後的版本；切換版型／配色也會保留修改。日期、時間、地點、名額請用上方欄位調整。</div>
+      <div class="hint-box" style="margin:0 0 12px">✏️ <b>海報上的文字可直接點擊修改</b>（標題、主題、報名方式等）。改完按「📥 存成圖片」就會存成您編輯後的版本；切換版型／配色也會保留修改。日期、時間、地點、名額請用上方欄位調整。</div>
       <div class="poster-preview"><div id="posterCanvas"></div></div>
     </div>
   </div>
