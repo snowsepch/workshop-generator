@@ -376,13 +376,13 @@
   .poster.sq .p-topic .pt-n{font-size:14px}
   .poster .p-topic .pt-d{font-size:13px;color:#7a766f;font-weight:500;margin-top:2px}
   .poster.sq .p-topic .pt-d{font-size:11px}
-  .poster .p-info{display:grid;grid-template-columns:1fr 1fr;gap:16px 22px;background:#1A1A1A;color:#F5F3EE;border-radius:18px;padding:24px 28px;margin-bottom:22px}
-  .poster.sq .p-info{padding:15px 18px;gap:9px 16px;margin-bottom:0;border-radius:14px}
+  .poster .p-info{display:grid;grid-template-columns:1fr 1fr;gap:16px 22px;background:#1A1A1A;color:#F5F3EE;border-radius:18px;padding:24px 28px;margin:auto 0 20px}
+  .poster.sq .p-info{padding:15px 18px;gap:9px 16px;margin:auto 0 0;border-radius:14px}
   .poster .p-info .pi-row{display:flex;flex-direction:column;gap:4px}
   .poster .p-info .pi-k{font-size:11px;font-weight:800;color:var(--ac);letter-spacing:.08em}
   .poster .p-info .pi-v{font-size:18px;font-weight:800}
   .poster.sq .p-info .pi-v{font-size:14px}
-  .poster .p-foot{display:flex;justify-content:space-between;align-items:center;gap:16px;border-top:2px dashed rgba(26,26,26,.18);padding-top:20px;margin-top:auto}
+  .poster .p-foot{display:flex;justify-content:space-between;align-items:center;gap:16px;border-top:2px dashed rgba(26,26,26,.18);padding-top:20px}
   .poster.sq .p-foot{padding-top:13px}
   .poster .p-foot-txt{font-size:15px;font-weight:700;color:#1A1A1A;line-height:1.5}
   .poster .p-foot-txt span{display:inline-block;color:#F5F3EE;background:var(--ac);padding:4px 13px;border-radius:980px;font-weight:900;margin-bottom:7px}
@@ -393,6 +393,10 @@
   .theme-sw .sw{width:30px;height:30px;border-radius:9px;cursor:pointer;border:2px solid transparent;transition:.12s}
   .theme-sw .sw:hover{transform:scale(1.08)}
   .theme-sw .sw.on{border-color:#fff;box-shadow:0 0 0 2px #1d1d1f}
+  /* 海報可手動編輯文字（提示只在 hover/focus 顯示，截圖前會 blur 故不會入鏡）*/
+  .poster [data-edit]{outline:none}
+  .poster-preview .poster [data-edit]:hover{outline:1.5px dashed rgba(26,26,26,.3);outline-offset:3px;cursor:text;border-radius:3px}
+  .poster-preview .poster [data-edit]:focus{outline:2px solid var(--ac);outline-offset:3px;border-radius:3px}
 
 
   /* ===== 社群文案 ===== */
@@ -720,9 +724,11 @@
           <div class="sw" style="background:#9C2A2A" title="磚紅 Brick" onclick="setPosterTheme('#9C2A2A',this)"></div>
         </div>
         <button class="copy-btn" onclick="renderPoster()">🔄 更新海報</button>
+        <button class="copy-btn" style="background:#8a6d3b" onclick="resetPosterEdits()" title="清除手動修改的文字，回到自動產生的內容">↩︎ 還原文字</button>
         <button class="copy-btn" style="background:var(--green)" onclick="downloadPosterImage()">📥 存成圖片</button>
         <button class="copy-btn" style="background:#444" onclick="printPoster()">🖨 列印</button>
       </div>
+      <div class="hint-box" style="margin:0 0 12px">✏️ <b>海報上的文字可直接點擊修改</b>（標題、主題、報名方式等）。改完按「📥 存成圖片」或「🖨 列印」就會存成您編輯後的版本；切換版型／配色也會保留修改。日期、時間、地點、名額請用上方欄位調整。</div>
       <div class="poster-preview"><div id="posterCanvas"></div></div>
     </div>
   </div>
@@ -3725,6 +3731,12 @@ function saveEventFromPoster(){
 /* ---------- 宣傳海報 ---------- */
 let POSTER_FMT='a4';
 let POSTER_AC='#F5A623';   // 海報強調色（橘/珊瑚橘/海軍藍/磚紅 可切換）
+let POSTER_EDITS={};       // 手動編輯後的文字覆寫（key→文字），切換版型/風格時保留
+function harvestPosterEdits(){
+  const pe=document.getElementById('posterEl'); if(!pe) return;
+  pe.querySelectorAll('[data-edit]').forEach(el=>{ POSTER_EDITS[el.dataset.edit]=el.innerText.replace(/\s*\n\s*/g,' ').trim(); });
+}
+function ed(key, def){ const v=POSTER_EDITS[key]; return escapeHtml((v!=null && v!=='')?v:def); }
 function openPosterModal(){
   if(!requireTopics()) return;
   const ev=loadEvent();
@@ -3738,22 +3750,26 @@ function openPosterModal(){
     const c=(s.getAttribute('style').match(/background:(#[0-9A-Fa-f]{6})/)||[])[1];
     s.classList.toggle('on', c && c.toUpperCase()===POSTER_AC.toUpperCase());
   });
+  POSTER_EDITS={};              // 每次開啟視為新海報，清掉舊覆寫
   openModal('posterModal');
-  renderPoster();
+  renderPoster(true);
 }
 function setPosterFormat(fmt, btn){
   POSTER_FMT=fmt;
   document.querySelectorAll('#po_seg button').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
-  renderPoster();
+  renderPoster();               // 版型不同需重建，會先保留目前文字編輯
 }
 function setPosterTheme(color, el){
   POSTER_AC=color;
   document.querySelectorAll('#po_theme .sw').forEach(s=>s.classList.remove('on'));
   el.classList.add('on');
-  renderPoster();
+  const pe=document.getElementById('posterEl');
+  if(pe) pe.style.setProperty('--ac', color); else renderPoster(true);  // 只換色不重建，保留手動編輯
 }
-function renderPoster(){
+function resetPosterEdits(){ POSTER_EDITS={}; renderPoster(true); }
+function renderPoster(skipHarvest){
+  if(!skipHarvest) harvestPosterEdits();   // 重建前先保留使用者已改的文字
   saveEventFromPoster();
   document.getElementById('posterCanvas').innerHTML=buildPosterHTML();
   renderQRInto('posterQR', document.getElementById('po_qr').value.trim(), POSTER_FMT==='sq'?92:108);
@@ -3775,15 +3791,16 @@ function buildPosterHTML(){
     list=topics.slice(0,3);
     extra='<div class="p-topic" style="background:#1A1A1A;border-left-color:#1A1A1A"><span class="pt-i" style="background:rgba(255,255,255,.12)">➕</span><div><div class="pt-n" style="color:#F5F3EE">還有 '+(topics.length-3)+' 個主題</div><div class="pt-d" style="color:var(--ac)">當天一起聊</div></div></div>';
   }
-  const topicRows=list.map(t=>'<div class="p-topic"><span class="pt-i">'+t.ico+'</span><div><div class="pt-n">'+escapeHtml(t.n)+'</div><div class="pt-d">'+escapeHtml(t.tagline||t.sub||'')+'</div></div></div>').join('')+extra;
-  const subText=topics.length===1?escapeHtml(topics[0].sub||''):'一次認識多個主題，看看它們在生活裡怎麼搭';
+  const E=' contenteditable="true" spellcheck="false"';
+  const topicRows=list.map((t,i)=>'<div class="p-topic"><span class="pt-i">'+t.ico+'</span><div><div class="pt-n" data-edit="t'+i+'n"'+E+'>'+ed('t'+i+'n',t.n)+'</div><div class="pt-d" data-edit="t'+i+'d"'+E+'>'+ed('t'+i+'d',t.tagline||t.sub||'')+'</div></div></div>').join('')+extra;
+  const subDef=topics.length===1?(topics[0].sub||''):'一次認識多個主題，看看它們在生活裡怎麼搭';
   return '<div class="poster '+cls+'" id="posterEl" style="--ac:'+POSTER_AC+'">'+
-    '<div class="p-top"><div class="p-brand"><span class="pl-logo">A</span>小教室</div><div class="p-store">'+escapeHtml(store)+'</div></div>'+
-    '<div class="p-kicker">免費・歡迎參加</div>'+
-    '<div class="p-emoji">'+heroEmoji+'</div>'+
-    '<div class="p-title">'+escapeHtml(title)+'</div>'+
-    '<div class="p-sub">'+subText+'</div>'+
-    '<div class="p-tags"><span>🎯 適合：'+escapeHtml(ageStr)+'</span><span>🙌 含實機操作</span><span>⏱ 約 '+($('#dur').value||60)+' 分鐘</span></div>'+
+    '<div class="p-top"><div class="p-brand"><span class="pl-logo">A</span><span data-edit="brand"'+E+'>'+ed('brand','小教室')+'</span></div><div class="p-store" data-edit="store"'+E+'>'+ed('store',store)+'</div></div>'+
+    '<div class="p-kicker" data-edit="kicker"'+E+'>'+ed('kicker','免費・歡迎參加')+'</div>'+
+    '<div class="p-emoji" data-edit="emoji"'+E+'>'+ed('emoji',heroEmoji)+'</div>'+
+    '<div class="p-title" data-edit="title"'+E+'>'+ed('title',title)+'</div>'+
+    '<div class="p-sub" data-edit="sub"'+E+'>'+ed('sub',subDef)+'</div>'+
+    '<div class="p-tags"><span data-edit="tag0"'+E+'>'+ed('tag0','🎯 適合：'+ageStr)+'</span><span data-edit="tag1"'+E+'>'+ed('tag1','🙌 含實機操作')+'</span><span data-edit="tag2"'+E+'>'+ed('tag2','⏱ 約 '+($('#dur').value||60)+' 分鐘')+'</span></div>'+
     '<div class="p-topics">'+topicRows+'</div>'+
     '<div class="p-info">'+
       '<div class="pi-row"><div class="pi-k">📅 日期</div><div class="pi-v">'+escapeHtml(date)+'</div></div>'+
@@ -3791,13 +3808,15 @@ function buildPosterHTML(){
       '<div class="pi-row"><div class="pi-k">📍 地點</div><div class="pi-v">'+escapeHtml(place)+'</div></div>'+
       '<div class="pi-row"><div class="pi-k">👥 名額</div><div class="pi-v">'+escapeHtml(seats)+'</div></div>'+
     '</div>'+
-    '<div class="p-foot"><div class="p-foot-txt"><span>立即報名 →</span><br>'+escapeHtml(signup)+'</div><div class="p-qr" id="posterQR"></div></div>'+
+    '<div class="p-foot"><div class="p-foot-txt"><span data-edit="cta"'+E+'>'+ed('cta','立即報名 →')+'</span><br><span data-edit="signup"'+E+'>'+ed('signup',signup)+'</span></div><div class="p-qr" id="posterQR"></div></div>'+
   '</div>';
 }
 function downloadPosterImage(){
   const node=document.getElementById('posterEl');
   if(!node){ alert('請先按「更新海報」'); return; }
   if(typeof html2canvas==='undefined'){ alert('截圖元件載入中，請稍候再試'); return; }
+  harvestPosterEdits();
+  if(document.activeElement && document.activeElement.blur) document.activeElement.blur();
   html2canvas(node, {scale:3, backgroundColor:'#F5F3EE', useCORS:true}).then(canvas=>{
     const a=document.createElement('a');
     a.href=canvas.toDataURL('image/png');
@@ -3805,7 +3824,7 @@ function downloadPosterImage(){
     a.click();
   }).catch(e=>{ alert('產生圖片失敗：'+e.message); });
 }
-function printPoster(){ const n=document.getElementById('posterEl'); if(!n){ alert('請先按「更新海報」'); return; } printNodeViaCanvas(n,'宣傳海報'); }
+function printPoster(){ const n=document.getElementById('posterEl'); if(!n){ alert('請先按「更新海報」'); return; } harvestPosterEdits(); if(document.activeElement&&document.activeElement.blur) document.activeElement.blur(); printNodeViaCanvas(n,'宣傳海報'); }
 
 /* ---------- 社群文案 ---------- */
 function openSocialModal(){ if(!requireTopics()) return; renderSocial(); openModal('socialModal'); }
