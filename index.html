@@ -186,6 +186,9 @@
   .feat-tip{margin-top:10px;padding:8px 12px;background:rgba(0,113,227,.08);border-radius:6px;font-size:12px;line-height:1.55;color:#1d4ed8}
   .slide.dark .feat-tip{background:rgba(96,165,250,.12);color:#93c5fd}
   .feat-tip b{font-weight:700}
+  .feat-req{margin-top:6px;font-size:11px;line-height:1.5;color:#86868b}
+  .feat-req b{font-weight:600;color:#6e6e73}
+  .slide.dark .feat-req{color:#a1a1a6}
 
   /* SCN-TIP (情境達人小撇步) */
   .scn-tip{margin-top:10px;padding:8px 11px;background:rgba(217,119,6,.08);border-radius:6px;font-size:12px;line-height:1.55;color:#b45309}
@@ -1403,6 +1406,44 @@ const TOPICS = [
   },
 
   {
+    n:"和家人一起｜FaceTime 團聚", ico:"📹",
+    sub:"再遠，也像坐在同一張桌子旁",
+    tagline:"群組視訊 × 一起看 × 看得到也看得懂",
+    welcome:"很多人家裡的孩子在外地工作、唸書，或是孫子住得遠，一年見不到幾次面。今天想跟大家分享，怎麼用 iPhone 本來就有的 FaceTime，跟家人視訊、甚至一起看同一部劇 —— 就算隔著一座城市，感覺還是像坐在同一張桌子旁邊。",
+    requirements:{
+      os:"iOS 26 / iPadOS 26 / macOS 26 或以上版本（舊版本也大多支援）",
+      capacity:"不限容量（視訊通話不佔手機空間）",
+      sim:"需 Apple 帳號 · FaceTime 可跨平台（傳連結給 Android、Windows 也能加入）",
+      compat:"群組通話最多 32 人 · SharePlay 需通話雙方都開啟 · 即時字幕可將語音轉成文字（語言支援以系統設定為準）",
+      icloud:"搭配 iCloud 可在 iPhone、iPad、Mac 之間接續同一通電話"
+    },
+    stats:[
+      {n:"32",u:"人",l:"群組視訊同時上線"},
+      {n:"4K",u:"",l:"高畫質，家人的臉看得清楚"},
+      {n:"0",u:"元",l:"Wi-Fi 下通話不花錢"}
+    ],
+    features:[
+      {fi:"📞",ft:"全家一起上線的群組視訊",fd:"不只是一對一。可以把住在不同地方的家人通通拉進同一通 FaceTime，最多 32 個人，過年過節想全家見個面，不用真的湊在一起也辦得到。",req:"支援 FaceTime 的 iPhone、iPad、Mac 皆可使用，群組最多 32 人（Apple 未公開標示最低系統版本）"},
+      {fi:"🎬",ft:"一起看同一部劇、聽同一首歌",fd:"這個叫 SharePlay。視訊的時候打開影片或音樂，兩邊會同步播放，您按暫停對方也跟著停。就像以前一起窩在沙發上看電視，只是現在隔著螢幕，邊看邊聊一樣熱鬧。",req:"需通話雙方都更新到支援 SharePlay 的系統並一起開啟（Apple 未公開標示最低系統版本）"},
+      {fi:"💬",ft:"聽不太清楚？用看的也行",fd:"FaceTime 有個即時字幕功能，會把對方說的話即時變成文字顯示在畫面上。電話那頭講太快、環境吵、或耳朵不太靈光的時候，看著文字就不會漏接重點。",req:"需 iPhone 11 或以後機型（iPad 需 A12 以上、Mac 需 Apple 晶片）；支援語言含繁體中文（台灣）；Apple 標示為 beta 功能"},
+      {fi:"🎯",ft:"鏡頭會自己跟著您",fd:"視訊時不用一直喬位置。人物居中功能會自動跟著您移動，您起身倒杯水、抱個孫子，畫面都會把您留在中間，對方一直看得到您。這是 iPhone 17 系列與 iPhone Air 前鏡頭的新功能。",req:"iPhone 前鏡頭人物居中目前僅 iPhone 17、iPhone 17 Pro、iPhone Air 支援（隨 iOS 26 出貨）；較舊 iPhone 不支援"},
+      {fi:"📸",ft:"在聊天裡直接拍、直接傳",fd:"在訊息對話裡就能打開相機拍照、錄影，拍完還能隨手畫個圈、加幾個字再傳出去。看到好吃的、孫子的塗鴉，當下就分享，不用切來切去。",req:"一般 iPhone 皆可，Apple 官方未列特定機型或系統版本需求"},
+      {fi:"🔗",ft:"傳個連結，誰都能加入",fd:"家人有人用 Android 或電腦怎麼辦？FaceTime 可以產生一條連結，傳給對方點開就能加入，不必每個人都有 iPhone，全家不同手機也能同框。",req:"建立連結需 iOS／iPadOS 15 或 macOS Monterey（12）以上；對方用最新版 Chrome 或 Edge 瀏覽器即可加入"}
+    ],
+    scenarios:[
+      {i:"👨‍👩‍👧‍👦",t:"跟在外地的孩子、孫子見面",d:"孩子在外地、孫子住得遠，平常打字聊不夠。約個時間視訊，看到表情、聽到聲音，比文字訊息溫暖太多，孫子長高了、會說話了都看得到。"},
+      {i:"🍿",t:"遠距也能一起追劇",d:"以前要一起看部電影得約出門。現在用 SharePlay，各自在家、畫面同步，一邊看一邊在電話裡聊劇情，週末晚上就是一場家庭電影夜。"},
+      {i:"👂",t:"長輩聽不清楚也不怕",d:"家裡長輩耳朵不太靈光，常常電話講一半就「啊？你說什麼？」。打開即時字幕，對方說的話變成文字，看著螢幕就懂，溝通不再卡卡。"},
+      {i:"📷",t:"把當下的生活馬上分享",d:"在外面吃到好料、看到漂亮風景，在訊息裡直接拍下來、圈個重點傳給家人，當下的心情立刻送到，不用回家再慢慢挑照片。"}
+    ],
+    accessories:[
+      {i:"🎧",n:"AirPods Pro 3",p:"聽得更清楚、講話更乾淨",why:"視訊時降噪加語音隔離，對方聽得清楚、您也不被環境吵到，長輩戴著講電話特別有感"},
+      {i:"📱",n:"MagSafe 桌上立架",p:"視訊不用手一直拿著",why:"手機往上一吸就立好，全家圍著也都入鏡，邊視訊邊吃飯、做事雙手都能空出來"},
+      {i:"🔋",n:"MagSafe 行動電源",p:"久聊久看也不斷電",why:"群組視訊、一起追劇很耗電，磁吸貼著邊充邊用，整場聊下來不用擔心沒電"}
+    ]
+  },
+
+  {
     n:"提醒事項與行事曆", ico:"📅",
     sub:"用 iPhone 管理人生大小事",
     tagline:"智慧分類 × 地點提醒 × 家庭共享",
@@ -1972,6 +2013,7 @@ function buildFeaturesA(topic, age, pNum, tNum){
         <div class="feat-body">
           <div class="ft"><span class="fi">${f.fi}</span>${f.ft}</div>
           <div class="fd">${f.fd}</div>
+          ${f.req?`<div class="feat-req">⚙️ <b>系統需求：</b>${f.req}</div>`:''}
           <div class="feat-tip">💡 <b>實用小提醒：</b>${getFeatureTip(f, i)}</div>
         </div>
       </div>`).join('')}
@@ -2004,6 +2046,7 @@ function buildFeaturesB(topic, age, pNum, tNum){
         <div class="feat-body">
           <div class="ft"><span class="fi">${f.fi}</span>${f.ft}</div>
           <div class="fd">${f.fd}</div>
+          ${f.req?`<div class="feat-req">⚙️ <b>系統需求：</b>${f.req}</div>`:''}
           <div class="feat-tip">💡 <b>實用小提醒：</b>${getFeatureTip(f, i+3)}</div>
         </div>
       </div>`).join('')}
@@ -2592,7 +2635,7 @@ function downloadPptx(){
       const y = 1.8 + i*1.7;
       s4.addText(String(i+1).padStart(2,'0'), { x:0.5, y:y, w:0.8, h:1.4, fontSize:42, color:C.accent, fontFace:FONT, bold:true });
       s4.addText(`${f.fi} ${f.ft}`, { x:1.5, y:y, w:11, h:0.5, fontSize:18, color:C.ink, fontFace:FONT, bold:true });
-      s4.addText(f.fd, { x:1.5, y:y+0.55, w:11, h:1.2, fontSize:13, color:'555555', fontFace:FONT, valign:'top' });
+      s4.addText(f.fd + (f.req?`\n⚙️ 系統需求：${f.req}`:''), { x:1.5, y:y+0.55, w:11, h:1.2, fontSize:13, color:'555555', fontFace:FONT, valign:'top' });
     });
 
     // ===== Slide 5: 核心功能（下） =====
@@ -2604,7 +2647,7 @@ function downloadPptx(){
       const y = 1.8 + i*1.7;
       s5.addText(String(i+4).padStart(2,'0'), { x:0.5, y:y, w:0.8, h:1.4, fontSize:42, color:C.accent, fontFace:FONT, bold:true });
       s5.addText(`${f.fi} ${f.ft}`, { x:1.5, y:y, w:11, h:0.5, fontSize:18, color:C.ink, fontFace:FONT, bold:true });
-      s5.addText(f.fd, { x:1.5, y:y+0.55, w:11, h:1.2, fontSize:13, color:'555555', fontFace:FONT, valign:'top' });
+      s5.addText(f.fd + (f.req?`\n⚙️ 系統需求：${f.req}`:''), { x:1.5, y:y+0.55, w:11, h:1.2, fontSize:13, color:'555555', fontFace:FONT, valign:'top' });
     });
 
     // ===== Slide 6: 動手實作 =====
@@ -2976,6 +3019,7 @@ function buildFusedHighlights(highlights, group, label, pNum, tNum){
         <div class="feat-body">
           <div class="ft"><span class="fi">${f.fi}</span>${f.ft}</div>
           <div class="fd">${f.fd}</div>
+          ${f.req?`<div class="feat-req">⚙️ <b>系統需求：</b>${f.req}</div>`:''}
           <div class="feat-tip">📦 <b>來自：</b>${f.topic.ico} ${f.topic.n}</div>
         </div>
       </div>`).join('')}
