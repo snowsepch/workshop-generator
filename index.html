@@ -428,6 +428,7 @@
     <button class="btn ghost" onclick="openPosterModal()" title="依當次選取主題產生宣傳海報">📣 宣傳海報</button>
     <button class="btn ghost" onclick="openSocialModal()" title="依當次選取主題產生社群開課文案">✍️ 社群文案</button>
     <button class="btn ghost" onclick="toggleEditMode()" id="editBtn" disabled>✏️ 編輯</button>
+    <button class="btn ghost" onclick="downloadPodcastScript()" title="把選取主題轉成單人旁白備課講稿(.txt)下載，可直接照著練口條">📻 備課講稿</button>
     <button class="btn ghost" onclick="downloadPptx()" id="pptxBtn" disabled>📥 下載 .pptx</button>
     <button class="btn" onclick="generate()">生成簡報</button>
   </div>
@@ -2539,6 +2540,58 @@ function buildAccessories(topic, age, pNum, tNum){
 /* ============================================
    下載 .pptx (Keynote 可直接開啟編輯)
    ============================================ */
+// 共用：把當次選取主題組成「單人旁白·精簡版」段落清單
+function buildPodcastData(){
+  const P = [];
+  const add = (t)=>{ if(t && String(t).trim()) P.push(String(t).replace(/\s+/g,' ').trim()); };
+  const oneSentence = (s)=>{ const m = String(s||'').match(/^[^。！？]*[。！？]/); return m ? m[0] : String(s||''); };
+
+  const topicNames = [...SELECTED_T].map(i=>TOPICS[i].n);
+  const ageStr = SELECTED_A.size ? [...SELECTED_A].map(i=>AGES[i].k).join('、') : '';
+
+  // 開場（精簡）
+  add(`小教室備課重點。這次要準備的主題是 ${topicNames.join('、')}。` + (ageStr?`客群設定是 ${ageStr}，口氣可以再貼近他們。`:''));
+
+  // 各主題（精簡：重點＋數字＋功能一句話＋配件，略過情境與長段落）
+  [...SELECTED_T].forEach((ti)=>{
+    const t = TOPICS[ti];
+    add(`先看「${t.n}」。${t.tagline?t.tagline+'。':(t.sub?t.sub+'。':'')}`);
+    if(t.stats && t.stats.length){
+      add(`記三個數字：` + t.stats.map(s=>`${s.n}${s.u?' '+s.u:''}，${s.l}`).join('；') + '。');
+    }
+    if(t.features && t.features.length){
+      t.features.forEach(f=> add(`${f.ft}。${oneSentence(f.fd)}`));
+    }
+    if(t.accessories && t.accessories.length){
+      add(`搭配重點別忘了帶：${t.accessories.map(a=>a.n).join('、')}。`);
+    }
+  });
+
+  // 結語（精簡）
+  add(`上台口訣：生活情境破冰，帶到 ${topicNames.join('、')} 的亮點，最後自然帶出配件。祝大家小教室順利。`);
+
+  const d = new Date();
+  const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  return { P, topicNames, dateStr };
+}
+
+function downloadPodcastScript(){
+  if(SELECTED_T.size === 0){ alert('請先在左側選擇至少一個主題'); return; }
+  const { P, topicNames, dateStr } = buildPodcastData();
+  const head = [
+    '# Apple Shop 小教室備課講稿（精簡版）',
+    `# 主題：${topicNames.join(' + ')}`,
+    '# 上台前照著順一次口條即可：# 開頭為註解，其餘為講稿內容，空行分段。',
+    '', ''
+  ].join('\n');
+  const blob = new Blob([head + P.join('\n\n') + '\n'], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `講稿_${topicNames.join('+')}_${dateStr}.txt`;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(a.href);
+}
+
 function downloadPptx(){
   if(!SLIDES.length){
     alert('請先生成簡報');
