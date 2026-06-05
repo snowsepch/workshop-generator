@@ -771,7 +771,7 @@ const TOPICS = [
     n:"iPhone 17 全面解析", ico:"📱",
     sub:"歷代最全方位的一款 iPhone",
     tagline:"螢幕更亮、晶片更強、相機更出色",
-    welcome:"今天想跟大家分享 iPhone 17。如果您正在考慮換手機，或想了解新機型有什麼不一樣，這 60 分鐘會帶您看看它的設計、效能、相機，以及實際用起來的感覺。",
+    welcome:"今天想跟大家分享 iPhone 17。如果您正在考慮換手機，或想了解新機型有什麼不一樣，今天會帶您看看它的設計、效能、相機，以及實際用起來的感覺。",
     requirements:{
       os:"iOS 26 或以上版本（隨機出廠預載）",
       capacity:["256GB","512GB"],
@@ -1737,7 +1737,7 @@ const TOPICS = [
     },
     stats:[
       {n:"10",u:"招",l:"必學基本操作"},
-      {n:"5",u:"分鐘",l:"每招學會的時間"},
+      {n:"3",u:"步內",l:"每招都好上手"},
       {n:"0",u:"門檻",l:"從頭開始學沒問題"}
     ],
     features:[
@@ -1745,8 +1745,12 @@ const TOPICS = [
       {fi:"🔙",ft:"從邊緣往內滑 — 上一頁",fd:"在 App 裡想回上一頁，從螢幕左邊往右滑。不用找『返回』按鈕，所有 App 都是這個手勢。"},
       {fi:"🔍",ft:"主畫面往下拉 — 搜尋一切",fd:"在主畫面從中間往下拉會出現搜尋欄。可以搜 App、聯絡人、訊息、設定。找東西最快的方法。"},
       {fi:"🎛",ft:"右上角往下滑 — 控制中心",fd:"螢幕右上角往下滑可以叫出控制中心。Wi-Fi、藍牙、手電筒、亮度、音量都在這裡，不用進設定。"},
+      {fi:"🔔",ft:"左上角往下滑 — 通知中心",fd:"螢幕左上角往下滑，漏接的訊息、提醒、App 通知都收在這裡。當下沒空看，回頭再慢慢翻。"},
       {fi:"💡",ft:"問 Siri — 不用記功能藏在哪",fd:"按住電源鍵或對著手機說『嘿 Siri』，直接告訴它您要做什麼。例如『打電話給媽媽』『開鬧鐘 7 點』。"},
-      {fi:"📲",ft:"AirDrop — 跟其他蘋果裝置傳檔案",fd:"想傳照片或檔案給旁邊的 Apple 用戶？點分享 > AirDrop，幾秒就到對方手機。比 LINE 快又不壓縮。"}
+      {fi:"📲",ft:"AirDrop — 跟其他蘋果裝置傳檔案",fd:"想傳照片或檔案給旁邊的 Apple 用戶？點分享 > AirDrop，幾秒就到對方手機。比 LINE 快又不壓縮。"},
+      {fi:"✊",ft:"長按 App 圖示 — 移動、刪除、快捷選單",fd:"手指按住 App 不放會跳出選單；圖示開始抖動時就能拖曳排列、或點角落刪除。長按相機、相簿還能直接跳到常用功能。"},
+      {fi:"📸",ft:"側邊鍵＋音量加 — 螢幕截圖",fd:"同時按右側電源鍵和左側音量加鍵，螢幕閃一下、左下出現縮圖，就是把畫面拍下來了。存票券、對帳、傳畫面都用得到。"},
+      {fi:"🔠",ft:"放大字級 — 看得更清楚",fd:"覺得字太小？到「設定 > 顯示與亮度 > 文字大小」拉一下，全系統的字一起變大，長輩用起來立刻舒服很多。"}
     ],
     scenarios:[
       {i:"📞",t:"我要打電話給小明",d:"對 Siri 說『打電話給小明』，不用解鎖、不用開 App，直接撥出去。開車的時候特別方便。"},
@@ -1812,6 +1816,18 @@ let SELECTED_T = new Set();
 let SELECTED_A = new Set();
 let SLIDES = [];
 let IDX = 0;
+let DUR = 60;   // 本場時長（分鐘），generate() 時由 #dur 帶入，預設 60
+
+/* 依總時長分配各段時間，加總精準等於 dur（預設 60 分鐘標準流程）。
+   回傳 [開場/定位, 功能介紹, 動手實作, 生活情境, 進階+快速上手, 回家功課+配件Q&A] */
+function planMinutes(dur){
+  dur = +dur || 60;
+  const w = [5,20,15,8,7,5];                 // 60 分鐘基準權重，總和 60
+  const wsum = w.reduce((a,b)=>a+b,0);
+  const m = w.map(x=>Math.round(x/wsum*dur));
+  m[m.length-1] += dur - m.reduce((a,b)=>a+b,0); // 補齊四捨五入誤差，確保總和=dur
+  return m;
+}
 const $ = q=>document.querySelector(q);
 
 function renderTopics(){
@@ -1884,29 +1900,30 @@ function buildCover(topic, age, pNum, tNum){
       <div class="cover-tags">
         <span>✨ ${topic.tagline}</span>
         <span>🎯 為您準備的內容</span>
-        <span>⏱ 約 60 分鐘</span>
+        <span>⏱ 約 ${DUR} 分鐘</span>
         <span>🙌 含實際操作時間</span>
       </div>
     </div>
     <div class="foot">
       <div>Apple Shop 小教室 · 顧客體驗分享</div>
-      <div>第 1 站 · 歡迎開場</div>
+      <div>第 ${pNum} 站 · 歡迎開場</div>
     </div>
   </div>`;
 }
 
 function buildAgenda(topic, age, pNum, tNum){
+  const M = planMinutes(DUR);
   const agendaItems = [
-    {n:"01", t:"先聊聊 "+topic.n, d:"它適合什麼樣的使用情境，跟您現在用的有什麼不同", time:"5 分鐘"},
-    {n:"02", t:"幾個值得一看的功能", d:"挑出最有感的幾個功能，搭配實機展示", time:"20 分鐘"},
-    {n:"03", t:"換您試試看", d:"挑幾個重要的功能，自己動手操作看看", time:"15 分鐘"},
-    {n:"04", t:"生活上怎麼用", d:"看看在工作、家庭、娛樂、健康各種情境的用法", time:"10 分鐘"},
-    {n:"05", t:"快速上手 + 進階小技巧", d:"幫您把功能整理成步驟，再聊幾個進階用法", time:"10 分鐘"},
-    {n:"06", t:"回家功課 + 配件搭配", d:"回家可以練的小目標、幾個常見的搭配", time:"5 分鐘"}
+    {n:"01", t:"先聊聊 "+topic.n, d:"它適合什麼樣的使用情境，跟您現在用的有什麼不同", time:M[0]+" 分鐘"},
+    {n:"02", t:"幾個值得一看的功能", d:"挑出最有感的功能逐一介紹，搭配實機展示", time:M[1]+" 分鐘"},
+    {n:"03", t:"換您試試看", d:"挑幾個重要功能，自己動手操作一次", time:M[2]+" 分鐘"},
+    {n:"04", t:"生活上怎麼用", d:"看看在工作、家庭、娛樂、健康各種情境的用法", time:M[3]+" 分鐘"},
+    {n:"05", t:"進階技巧 + 快速上手", d:"多學幾個進階用法，再把重點整理成可帶回家的步驟", time:M[4]+" 分鐘"},
+    {n:"06", t:"回家功課 + 配件搭配 + Q&A", d:"回家可以練的小目標、常見的搭配、現場提問", time:M[5]+" 分鐘"}
   ];
   const outcomes = topic.outcomes || [
     `了解 ${topic.n} 跟您現在用的有什麼不同`,
-    `學會操作「${topic.features[0].ft.replace(/[—,，·].*/,'').trim()}」這類常用功能`,
+    `學會操作「${topic.features[0].ft.replace(/[—·].*/,'').trim()}」這類常用功能`,
     `判斷它是不是適合您現在的需求`
   ];
   return `<div class="slide light">
@@ -1916,7 +1933,7 @@ function buildAgenda(topic, age, pNum, tNum){
     </div>
     <div class="slide-hd">
       <div class="label">今天會聊什麼</div>
-      <div class="title">${topic.n} · 這 60 分鐘的安排</div>
+      <div class="title">${topic.n} · 這 ${DUR} 分鐘的安排</div>
       <div class="sub">會兼顧「聽我說」與「您動手」，希望您離開時不只是聽過，而是會用。</div>
     </div>
     <div class="rule"></div>
@@ -1945,7 +1962,7 @@ function buildAgenda(topic, age, pNum, tNum){
     </div>
 
     <div class="foot">
-      <div>第 2 站 · 今日學習地圖</div>
+      <div>第 ${pNum} 站 · 今日學習地圖</div>
       <div>Apple Shop · 感謝您的參與</div>
     </div>
   </div>`;
@@ -1998,73 +2015,48 @@ function buildWhy(topic, age, pNum, tNum){
     </div>
 
     <div class="foot">
-      <div>第 3 站 · 產品定位</div>
+      <div>第 ${pNum} 站 · 產品定位</div>
       <div>Apple Shop · 感謝您的參與</div>
     </div>
   </div>`;
 }
 
-function buildFeaturesA(topic, age, pNum, tNum){
-  const half = topic.features.slice(0,3);
+/* 把陣列切成每段最多 size 個 */
+function chunk(arr, size){ const out=[]; for(let i=0;i<arr.length;i+=size) out.push(arr.slice(i,i+size)); return out; }
+
+/* 核心功能頁：每頁最多 3 張卡（固定舒適密度，避免文字過載／字被擠小）。
+   startIdx＝本頁第一個功能在整體中的序號；pageIdx/pageCount＝第幾頁/共幾頁。 */
+function buildFeaturesPage(topic, age, items, startIdx, pageIdx, pageCount, pNum, tNum){
+  const part = pageCount>1 ? `（${pageIdx+1}/${pageCount}）` : '';
+  const sub = pageIdx===0
+    ? `${topic.tagline} — 先從最有感的開始聊。`
+    : '接著這幾個比較細，但用久了會發現很重要。';
   return `<div class="slide light">
     <div class="chrome">
-      <div>${topic.n} · 核心功能（上）</div>
+      <div>${topic.n} · 核心功能${part}</div>
       <div>第 ${pNum} / ${tNum} 頁</div>
     </div>
     <div class="slide-hd">
       <div class="label">值得一看的功能</div>
-      <div class="title">${topic.n} 前三個重點</div>
-      <div class="sub">${topic.tagline} — 先從這三個最有感的開始聊。</div>
+      <div class="title">${topic.n} 重點功能${part}</div>
+      <div class="sub">${sub}</div>
     </div>
     <div class="rule"></div>
 
     <div class="features features-single">
-      ${half.map((f,i)=>`<div class="feat feat-big">
-        <div class="feat-num">${String(i+1).padStart(2,'0')}</div>
+      ${items.map((f,i)=>`<div class="feat feat-big">
+        <div class="feat-num">${String(startIdx+i+1).padStart(2,'0')}</div>
         <div class="feat-body">
           <div class="ft"><span class="fi">${f.fi}</span>${f.ft}</div>
           <div class="fd">${f.fd}</div>
           ${f.req?`<div class="feat-req">⚙️ <b>系統需求：</b>${f.req}</div>`:''}
-          <div class="feat-tip">💡 <b>實用小提醒：</b>${getFeatureTip(f, i)}</div>
+          <div class="feat-tip">💡 <b>實用小提醒：</b>${getFeatureTip(f, startIdx+i)}</div>
         </div>
       </div>`).join('')}
     </div>
 
     <div class="foot">
-      <div>第 4 站 · 核心功能 (1/2)</div>
-      <div>Apple Shop · 感謝您的參與</div>
-    </div>
-  </div>`;
-}
-
-function buildFeaturesB(topic, age, pNum, tNum){
-  const half = topic.features.slice(3);
-  return `<div class="slide light">
-    <div class="chrome">
-      <div>${topic.n} · 核心功能（下）</div>
-      <div>第 ${pNum} / ${tNum} 頁</div>
-    </div>
-    <div class="slide-hd">
-      <div class="label">值得一看的功能</div>
-      <div class="title">${topic.n} 後三個重點</div>
-      <div class="sub">另外這三個比較細，但用久了會發現很重要。</div>
-    </div>
-    <div class="rule"></div>
-
-    <div class="features features-single">
-      ${half.map((f,i)=>`<div class="feat feat-big">
-        <div class="feat-num">${String(i+4).padStart(2,'0')}</div>
-        <div class="feat-body">
-          <div class="ft"><span class="fi">${f.fi}</span>${f.ft}</div>
-          <div class="fd">${f.fd}</div>
-          ${f.req?`<div class="feat-req">⚙️ <b>系統需求：</b>${f.req}</div>`:''}
-          <div class="feat-tip">💡 <b>實用小提醒：</b>${getFeatureTip(f, i+3)}</div>
-        </div>
-      </div>`).join('')}
-    </div>
-
-    <div class="foot">
-      <div>第 5 站 · 核心功能 (2/2)</div>
+      <div>第 ${pNum} 站 · 核心功能${part}</div>
       <div>Apple Shop · 感謝您的參與</div>
     </div>
   </div>`;
@@ -2084,11 +2076,14 @@ function getFeatureTip(feature, idx){
 }
 
 function buildHandsOn(topic, age, pNum, tNum){
+  const hm = planMinutes(DUR)[2];          // 動手實作總分鐘數
+  const each = Math.round(hm/3);
+  const taskMins = [each, each, hm-each*2]; // 三個任務分配，總和=hm
   const tasks = [
     {
       n:"01",
-      t:`先來試試「${topic.features[0].ft.replace(/[—,，·].*/,'').trim()}」`,
-      d:`找到並開啟這個功能，跟著示範操作一次看看。`,
+      t:`先來試試「${topic.features[0].ft.replace(/[—·].*/,'').trim()}」`,
+      d:topic.features[0].fd,
       time:"5 分鐘",
       steps:[
         "先看一次完整的操作流程",
@@ -2098,8 +2093,8 @@ function buildHandsOn(topic, age, pNum, tNum){
     },
     {
       n:"02",
-      t:`接下來試試「${topic.features[2].ft.replace(/[—,，·].*/,'').trim()}」`,
-      d:`這個功能用起來特別有感，您可以實際操作看看。`,
+      t:`接下來試試「${topic.features[2].ft.replace(/[—·].*/,'').trim()}」`,
+      d:topic.features[2].fd,
       time:"5 分鐘",
       steps:[
         "從剛剛的畫面繼續，照著步驟進入這個功能",
@@ -2110,7 +2105,7 @@ function buildHandsOn(topic, age, pNum, tNum){
     {
       n:"03",
       t:`情境練習：${topic.scenarios[0].t}`,
-      d:`把剛剛學到的功能組合起來，完成一個您日常會用到的任務。`,
+      d:topic.scenarios[0].d,
       time:"5 分鐘",
       steps:[
         `想像一下「${topic.scenarios[0].t}」的情境，您會怎麼做？`,
@@ -2119,6 +2114,7 @@ function buildHandsOn(topic, age, pNum, tNum){
       ]
     }
   ];
+  tasks.forEach((tk,i)=>{ tk.time = taskMins[i]+" 分鐘"; });
   return `<div class="slide warm">
     <div class="chrome">
       <div>${topic.n} · 動手實作時間</div>
@@ -2126,7 +2122,7 @@ function buildHandsOn(topic, age, pNum, tNum){
     </div>
     <div class="slide-hd">
       <div class="label">換您試試看</div>
-      <div class="title">${topic.n} · 動手試 15 分鐘</div>
+      <div class="title">${topic.n} · 動手試 ${hm} 分鐘</div>
       <div class="sub">不會操作沒關係，慢慢來就好，有問題隨時提出來。</div>
     </div>
     <div class="rule"></div>
@@ -2151,7 +2147,7 @@ function buildHandsOn(topic, age, pNum, tNum){
     </div>
 
     <div class="foot">
-      <div>第 6 站 · 換您試試看</div>
+      <div>第 ${pNum} 站 · 換您試試看</div>
       <div>Apple Shop · 感謝您的參與</div>
     </div>
   </div>`;
@@ -2191,7 +2187,7 @@ function buildScenarios(topic, age, pNum, tNum){
     </div>
 
     <div class="foot">
-      <div>第 7 站 · 生活應用情境</div>
+      <div>第 ${pNum} 站 · 生活應用情境</div>
       <div>Apple Shop · 感謝您的參與</div>
     </div>
   </div>`;
@@ -2344,10 +2340,10 @@ function getTopicResources(topicName){
 
 function buildHandbook(topic, age, pNum, tNum){
   const resources = getTopicResources(topic.n);
-  // 從兩本手冊中抽取共 6 個技巧（每本 3 個），直接展開顯示
+  // 從兩本手冊各抽 2 個技巧（共 4 個），避免單頁卡片過多、文字過載
   const allTips = [];
   resources.forEach(r=>{
-    r.tips.slice(0,3).forEach(tip=>allTips.push({...tip, src:r.n}));
+    r.tips.slice(0,2).forEach(tip=>allTips.push({...tip, src:r.n}));
   });
 
   return `<div class="slide warm">
@@ -2379,7 +2375,7 @@ function buildHandbook(topic, age, pNum, tNum){
     </div>
 
     <div class="foot">
-      <div>第 8 站 · 解鎖更多功能</div>
+      <div>第 ${pNum} 站 · 解鎖更多功能</div>
       <div>Apple Shop · 感謝您的參與</div>
     </div>
   </div>`;
@@ -2398,11 +2394,11 @@ function getHandbookContext(tipTitle, idx){
   return contexts[idx % contexts.length];
 }
 
-/* —— 第 7.5 站・快速入門步驟（5 個動手 step） —— */
+/* —— 快速上手・五個步驟整理（回顧今天學到的重點） —— */
 function buildQuickStart(topic, age, pNum, tNum){
   // 從 features 抽出前 5 個產生簡易步驟
   const steps = topic.features.slice(0,5).map((f,i)=>{
-    const title = f.ft.replace(/[—,，·].*/,'').trim();
+    const title = f.ft.replace(/[—·].*/,'').trim();
     return { n:String(i+1).padStart(2,'0'), t:title, fi:f.fi };
   });
 
@@ -2435,7 +2431,7 @@ function buildQuickStart(topic, age, pNum, tNum){
     </div>
 
     <div class="foot">
-      <div>快速上手・五個步驟</div>
+      <div>第 ${pNum} 站 · 快速上手・五個步驟</div>
       <div>Apple Shop · 感謝您的參與</div>
     </div>
   </div>`;
@@ -2488,7 +2484,7 @@ function buildHomework(topic, age, pNum, tNum){
     </div>
 
     <div class="foot">
-      <div>給您的回家功課</div>
+      <div>第 ${pNum} 站 · 給您的回家功課</div>
       <div>Apple Shop · 感謝您的參與</div>
     </div>
   </div>`;
@@ -2527,7 +2523,7 @@ function buildAccessories(topic, age, pNum, tNum){
 
     <div class="pitch-card blue" style="margin-top:18px">
       <div class="pl">🎓 今天聊到的內容</div>
-      <div class="pt">這 60 分鐘大概聊了：<br>
+      <div class="pt">這 ${DUR} 分鐘大概聊了：<br>
       &nbsp;&nbsp;① <b>它適合什麼情境</b> — 您是不是這樣的使用者<br>
       &nbsp;&nbsp;② <b>幾個值得一看的功能</b> — 從外觀到續航<br>
       &nbsp;&nbsp;③ <b>實際操作</b> — 您剛剛親手試過的<br>
@@ -2541,7 +2537,7 @@ function buildAccessories(topic, age, pNum, tNum){
     </div>
 
     <div class="foot">
-      <div>第 9 站 · 配件搭配 + 收尾</div>
+      <div>第 ${pNum} 站 · 配件搭配 + 收尾</div>
       <div>Apple Shop · 感謝您的參與</div>
     </div>
   </div>`;
@@ -2623,17 +2619,18 @@ function downloadPptx(){
 
   const FONT = 'PingFang TC';
   const C = { ink:'1D1D1F', paper:'F5F5F7', accent:'0071E3', warm:'C2410C', green:'15803D', dark:'0A1F3D', muted:'6E6E73' };
+  const M = planMinutes(DUR);   // 各段時間，與 HTML 投影片同源
 
-  const combos = [];
-  [...SELECTED_T].forEach(ti=>[...SELECTED_A].forEach(ai=>combos.push([ti,ai])));
+  const topicList = [...SELECTED_T].map(i=>TOPICS[i]);
+  const ageList   = [...SELECTED_A].map(i=>AGES[i]);
 
-  combos.forEach(([ti,ai])=>{
-    const t = TOPICS[ti], a = AGES[ai];
+  /* —— 單一主題：完整 9+ 頁流程（功能每 3 個一頁，避免爆版） —— */
+  function pptxSingle(t, a){
     const r = t.requirements || {};
     const capStr = Array.isArray(r.capacity) ? r.capacity.join(' / ') : (r.capacity || '—');
     const resources = getTopicResources(t.n);
 
-    // ===== Slide 1: 開場封面 =====
+    // 封面
     const s1 = pptx.addSlide();
     s1.background = { color: C.dark };
     s1.addText(t.ico, { x:0.5, y:0.5, w:2, h:1.5, fontSize:80, color:'FFFFFF', fontFace:FONT });
@@ -2641,19 +2638,19 @@ function downloadPptx(){
     s1.addText(t.n, { x:0.5, y:2.7, w:12, h:1.2, fontSize:52, color:'FFFFFF', fontFace:FONT, bold:true });
     s1.addText(t.sub, { x:0.5, y:4.0, w:12, h:0.6, fontSize:20, color:'FFFFFF', fontFace:FONT });
     s1.addText(t.welcome, { x:0.5, y:5.0, w:12, h:1.5, fontSize:14, color:'FFFFFF', fontFace:FONT, valign:'top', fill:{ color:'FFFFFF', transparency:88 } });
-    s1.addText(`✨ ${t.tagline}    🎯 為您客製的內容    ⏱ 約 60 分鐘`, { x:0.5, y:6.8, w:12, h:0.4, fontSize:12, color:'FFFFFF', fontFace:FONT });
+    s1.addText(`✨ ${t.tagline}    🎯 為您客製的內容    ⏱ 約 ${DUR} 分鐘`, { x:0.5, y:6.8, w:12, h:0.4, fontSize:12, color:'FFFFFF', fontFace:FONT });
 
-    // ===== Slide 2: 今日學習地圖 =====
+    // 今日學習地圖
     const s2 = pptx.addSlide();
     s2.background = { color: 'FFFFFF' };
     s2.addText('今日學習地圖', { x:0.5, y:0.3, w:12, h:0.4, fontSize:14, color:C.accent, fontFace:FONT, bold:true });
-    s2.addText('接下來 60 分鐘，您會學到這些', { x:0.5, y:0.7, w:12, h:0.8, fontSize:30, color:C.ink, fontFace:FONT, bold:true });
+    s2.addText(`接下來 ${DUR} 分鐘，您會學到這些`, { x:0.5, y:0.7, w:12, h:0.8, fontSize:30, color:C.ink, fontFace:FONT, bold:true });
     const agendaItems = [
-      ['01', '認識 '+t.n, '產品定位、目標族群、與市場其他選擇的差異', '5 分鐘'],
-      ['02', '核心功能完整解析', '六大重點功能逐一介紹，搭配實機展示', '20 分鐘'],
-      ['03', '🙌 動手實作時間', '親自體驗最重要的 3 個功能，講師逐桌協助', '15 分鐘'],
-      ['04', '生活應用情境', '看看它如何融入您的日常 — 工作、家庭、娛樂', '10 分鐘'],
-      ['05', '配件推薦與 Q&A', '完美搭配的配件介紹、現場回答疑問', '10 分鐘']
+      ['01', '認識 '+t.n, '產品定位、目標族群、與市場其他選擇的差異', M[0]+' 分鐘'],
+      ['02', '核心功能完整解析', `${t.features.length} 個重點功能逐一介紹，搭配實機展示`, M[1]+' 分鐘'],
+      ['03', '🙌 動手實作時間', '親自體驗最重要的 3 個功能，講師逐桌協助', M[2]+' 分鐘'],
+      ['04', '生活應用情境', '看看它如何融入您的日常 — 工作、家庭、娛樂', M[3]+' 分鐘'],
+      ['05', '進階技巧 + 配件 + Q&A', '多學幾招進階用法、完美搭配的配件、現場回答疑問', (M[4]+M[5])+' 分鐘']
     ];
     agendaItems.forEach((it,i)=>{
       const y = 1.8 + i*0.9;
@@ -2663,89 +2660,69 @@ function downloadPptx(){
       s2.addText(it[3], { x:11, y:y+0.15, w:1.8, h:0.4, fontSize:12, color:C.accent, fontFace:FONT, bold:true, align:'right' });
     });
 
-    // ===== Slide 3: 為什麼是它 + 規格 =====
+    // 為什麼是它 + 規格
     const s3 = pptx.addSlide();
     s3.background = { color: 'FFF7ED' };
     s3.addText('為什麼是它', { x:0.5, y:0.3, w:12, h:0.4, fontSize:14, color:C.warm, fontFace:FONT, bold:true });
     s3.addText(`${t.n} 為您解決了什麼？`, { x:0.5, y:0.7, w:12, h:0.8, fontSize:28, color:C.ink, fontFace:FONT, bold:true });
-    // 三大數據
     t.stats.forEach((st,i)=>{
       s3.addText(st.n + (st.u||''), { x:0.5+i*4.2, y:1.8, w:4, h:0.8, fontSize:36, color:C.accent, fontFace:FONT, bold:true, align:'center' });
       s3.addText(st.l, { x:0.5+i*4.2, y:2.7, w:4, h:0.4, fontSize:12, color:C.ink, fontFace:FONT, align:'center' });
     });
-    // 規格表
     s3.addText('📋 規格與系統需求', { x:0.5, y:3.4, w:12, h:0.4, fontSize:14, color:C.accent, fontFace:FONT, bold:true });
-    const specs = [
-      ['💻 系統版本', r.os||'—'],
-      ['📦 容量／版本', capStr],
-      ['📱 SIM／連線', r.sim||'—'],
-      ['⚙️ 相容性', r.compat||'—'],
-      ['☁️ iCloud 建議', r.icloud||'—']
-    ];
-    specs.forEach((sp,i)=>{
+    [['💻 系統版本', r.os||'—'],['📦 容量／版本', capStr],['📱 SIM／連線', r.sim||'—'],['⚙️ 相容性', r.compat||'—'],['☁️ iCloud 建議', r.icloud||'—']].forEach((sp,i)=>{
       const y = 3.9 + i*0.5;
       s3.addText(sp[0], { x:0.5, y:y, w:2.5, h:0.4, fontSize:12, color:'555555', fontFace:FONT, bold:true });
       s3.addText(sp[1], { x:3.1, y:y, w:9.5, h:0.4, fontSize:12, color:C.ink, fontFace:FONT });
     });
     s3.addText(`💡 ${a.pitch.replace(/<\/?b>/g,'')}`, { x:0.5, y:6.6, w:12, h:0.6, fontSize:12, color:C.green, fontFace:FONT, italic:true });
 
-    // ===== Slide 4: 核心功能（上） =====
-    const s4 = pptx.addSlide();
-    s4.background = { color: 'FFFFFF' };
-    s4.addText('核心功能 · 第一部分', { x:0.5, y:0.3, w:12, h:0.4, fontSize:14, color:C.accent, fontFace:FONT, bold:true });
-    s4.addText('前三大重點功能', { x:0.5, y:0.7, w:12, h:0.8, fontSize:30, color:C.ink, fontFace:FONT, bold:true });
-    t.features.slice(0,3).forEach((f,i)=>{
-      const y = 1.8 + i*1.7;
-      s4.addText(String(i+1).padStart(2,'0'), { x:0.5, y:y, w:0.8, h:1.4, fontSize:42, color:C.accent, fontFace:FONT, bold:true });
-      s4.addText(`${f.fi} ${f.ft}`, { x:1.5, y:y, w:11, h:0.5, fontSize:18, color:C.ink, fontFace:FONT, bold:true });
-      s4.addText(f.fd + (f.req?`\n⚙️ 系統需求：${f.req}`:''), { x:1.5, y:y+0.55, w:11, h:1.2, fontSize:13, color:'555555', fontFace:FONT, valign:'top' });
+    // 核心功能（每 3 個一頁）
+    const fChunks = chunk(t.features, 3);
+    fChunks.forEach((ch, pi)=>{
+      const part = fChunks.length>1 ? `（${pi+1}/${fChunks.length}）` : '';
+      const sf = pptx.addSlide();
+      sf.background = { color: 'FFFFFF' };
+      sf.addText('核心功能'+part, { x:0.5, y:0.3, w:12, h:0.4, fontSize:14, color:C.accent, fontFace:FONT, bold:true });
+      sf.addText(`重點功能${part}`, { x:0.5, y:0.7, w:12, h:0.8, fontSize:30, color:C.ink, fontFace:FONT, bold:true });
+      ch.forEach((f,i)=>{
+        const y = 1.8 + i*1.7;
+        sf.addText(String(pi*3+i+1).padStart(2,'0'), { x:0.5, y:y, w:0.8, h:1.4, fontSize:42, color:C.accent, fontFace:FONT, bold:true });
+        sf.addText(`${f.fi} ${f.ft}`, { x:1.5, y:y, w:11, h:0.5, fontSize:18, color:C.ink, fontFace:FONT, bold:true });
+        sf.addText(f.fd + (f.req?`\n⚙️ 系統需求：${f.req}`:''), { x:1.5, y:y+0.55, w:11, h:1.1, fontSize:13, color:'555555', fontFace:FONT, valign:'top' });
+      });
     });
 
-    // ===== Slide 5: 核心功能（下） =====
-    const s5 = pptx.addSlide();
-    s5.background = { color: 'FFFFFF' };
-    s5.addText('核心功能 · 第二部分', { x:0.5, y:0.3, w:12, h:0.4, fontSize:14, color:C.accent, fontFace:FONT, bold:true });
-    s5.addText('續航、連線與外觀', { x:0.5, y:0.7, w:12, h:0.8, fontSize:30, color:C.ink, fontFace:FONT, bold:true });
-    t.features.slice(3).forEach((f,i)=>{
-      const y = 1.8 + i*1.7;
-      s5.addText(String(i+4).padStart(2,'0'), { x:0.5, y:y, w:0.8, h:1.4, fontSize:42, color:C.accent, fontFace:FONT, bold:true });
-      s5.addText(`${f.fi} ${f.ft}`, { x:1.5, y:y, w:11, h:0.5, fontSize:18, color:C.ink, fontFace:FONT, bold:true });
-      s5.addText(f.fd + (f.req?`\n⚙️ 系統需求：${f.req}`:''), { x:1.5, y:y+0.55, w:11, h:1.2, fontSize:13, color:'555555', fontFace:FONT, valign:'top' });
-    });
-
-    // ===== Slide 6: 動手實作 =====
+    // 動手實作
     const s6 = pptx.addSlide();
     s6.background = { color: 'FFF7ED' };
     s6.addText('🙌 動手實作時間', { x:0.5, y:0.3, w:12, h:0.4, fontSize:14, color:C.warm, fontFace:FONT, bold:true });
-    s6.addText('換您試試看 · 15 分鐘實機體驗', { x:0.5, y:0.7, w:12, h:0.8, fontSize:28, color:C.ink, fontFace:FONT, bold:true });
+    s6.addText(`換您試試看 · ${M[2]} 分鐘實機體驗`, { x:0.5, y:0.7, w:12, h:0.8, fontSize:28, color:C.ink, fontFace:FONT, bold:true });
     s6.addText('講師會逐桌協助，請放心嘗試。', { x:0.5, y:1.5, w:12, h:0.4, fontSize:14, color:C.muted, fontFace:FONT });
-    const tasks = [
-      [`認識並開啟「${t.features[0].ft.replace(/[—,，·].*/,'').trim()}」`, '跟著講師一起，找到並開啟這項主要功能', '5 分鐘'],
-      [`親手體驗「${t.features[2].ft.replace(/[—,，·].*/,'').trim()}」`, '實際操作這項代表性功能', '5 分鐘'],
-      [`日常情境模擬：${t.scenarios[0].t}`, '綜合運用前面學到的功能完成完整任務', '5 分鐘']
-    ];
-    tasks.forEach((tk,i)=>{
-      const y = 2.3 + i*1.6;
+    const hEach = Math.round(M[2]/3), hMins = [hEach, hEach, M[2]-hEach*2];
+    [[`認識並開啟「${t.features[0].ft.replace(/[—·].*/,'').trim()}」`, t.features[0].fd, hMins[0]+' 分鐘'],
+     [`親手體驗「${(t.features[2]||t.features[t.features.length-1]).ft.replace(/[—·].*/,'').trim()}」`, (t.features[2]||t.features[t.features.length-1]).fd, hMins[1]+' 分鐘'],
+     [`日常情境模擬：${t.scenarios[0].t}`, t.scenarios[0].d, hMins[2]+' 分鐘']].forEach((tk,i)=>{
+      const y = 2.2 + i*1.65;
       s6.addText(String(i+1).padStart(2,'0'), { x:0.5, y:y, w:0.8, h:1.2, fontSize:36, color:C.warm, fontFace:FONT, bold:true });
       s6.addText(tk[0], { x:1.5, y:y, w:9, h:0.5, fontSize:16, color:C.ink, fontFace:FONT, bold:true });
-      s6.addText(tk[1], { x:1.5, y:y+0.55, w:9, h:0.6, fontSize:12, color:'555555', fontFace:FONT });
+      s6.addText(tk[1], { x:1.5, y:y+0.5, w:9.5, h:1.0, fontSize:11, color:'555555', fontFace:FONT, valign:'top' });
       s6.addText(`⏱ ${tk[2]}`, { x:11, y:y+0.2, w:1.8, h:0.5, fontSize:12, color:C.warm, fontFace:FONT, bold:true, align:'right' });
     });
 
-    // ===== Slide 7: 生活情境 =====
+    // 生活情境
     const s7 = pptx.addSlide();
     s7.background = { color: 'FFFFFF' };
     s7.addText('融入您的日常', { x:0.5, y:0.3, w:12, h:0.4, fontSize:14, color:C.accent, fontFace:FONT, bold:true });
     s7.addText(`${t.n} 如何改變您的生活？`, { x:0.5, y:0.7, w:12, h:0.8, fontSize:28, color:C.ink, fontFace:FONT, bold:true });
     t.scenarios.forEach((sc,i)=>{
-      const x = 0.5 + (i%2)*6.3;
-      const y = 1.9 + Math.floor(i/2)*2.7;
+      const x = 0.5 + (i%2)*6.3, y = 1.9 + Math.floor(i/2)*2.7;
       s7.addText(sc.i, { x:x, y:y, w:0.8, h:0.7, fontSize:32, fontFace:FONT });
       s7.addText(sc.t, { x:x+0.9, y:y, w:5, h:0.5, fontSize:17, color:C.ink, fontFace:FONT, bold:true });
       s7.addText(sc.d, { x:x+0.9, y:y+0.55, w:5, h:1.8, fontSize:12, color:'555555', fontFace:FONT, valign:'top' });
     });
 
-    // ===== Slide 8: 進階使用技巧（官方手冊） =====
+    // 進階技巧
     const s8 = pptx.addSlide();
     s8.background = { color: 'FFF7ED' };
     s8.addText('進階使用技巧', { x:0.5, y:0.3, w:12, h:0.4, fontSize:14, color:C.warm, fontFace:FONT, bold:true });
@@ -2762,7 +2739,7 @@ function downloadPptx(){
       });
     });
 
-    // ===== Slide 9: 配件 + 收尾 =====
+    // 配件 + 收尾
     const s9 = pptx.addSlide();
     s9.background = { color: C.dark };
     s9.addText('完美搭配 · 帶回家更實用', { x:0.5, y:0.3, w:12, h:0.4, fontSize:14, color:'FB7185', fontFace:FONT, bold:true });
@@ -2777,7 +2754,131 @@ function downloadPptx(){
     });
     s9.addText('🙏 感謝您的參與', { x:0.5, y:5.5, w:12, h:0.5, fontSize:18, color:'FFFFFF', fontFace:FONT, bold:true });
     s9.addText('下次小教室再見！', { x:0.5, y:6.0, w:12, h:0.5, fontSize:14, color:'FFFFFF', fontFace:FONT });
-  });
+  }
+
+  /* —— 多主題融合：與螢幕版 buildFusedDeck 同結構（保證每個主題都出現） —— */
+  function pptxFused(topics, a){
+    const title = getSmartTitle(topics);
+    const featPool = roundRobin(topics, 'features');
+    const scnPool  = roundRobin(topics, 'scenarios');
+    const accPool  = roundRobin(topics, 'accessories');
+    const want = Math.min(featPool.length, Math.max(topics.length, 9));
+    const highlights = featPool.slice(0, want);
+
+    // 封面
+    const c1 = pptx.addSlide();
+    c1.background = { color: C.dark };
+    c1.addText(topics.map(t=>t.ico).join(' '), { x:0.5, y:0.6, w:12, h:1.2, fontSize:54, color:'FFFFFF', fontFace:FONT });
+    c1.addText('小教室分享 · 主題式講座', { x:0.5, y:2.1, w:12, h:0.4, fontSize:14, color:'93C5FD', fontFace:FONT, bold:true });
+    c1.addText(title, { x:0.5, y:2.6, w:12, h:1.2, fontSize:46, color:'FFFFFF', fontFace:FONT, bold:true });
+    c1.addText(`今天把 ${topics.length} 個有關聯的主題放在一起聊，看它們在生活裡怎麼搭起來、讓日子更順手。`, { x:0.5, y:4.2, w:12, h:1.4, fontSize:14, color:'FFFFFF', fontFace:FONT, valign:'top', fill:{ color:'FFFFFF', transparency:88 } });
+    c1.addText(`✨ ${topics.length} 個主題一起聊    🙌 含實際操作時間    ⏱ 約 ${DUR} 分鐘`, { x:0.5, y:6.8, w:12, h:0.4, fontSize:12, color:'FFFFFF', fontFace:FONT });
+
+    // 今日學習地圖
+    const c2 = pptx.addSlide();
+    c2.background = { color: 'FFFFFF' };
+    c2.addText('今日學習地圖', { x:0.5, y:0.3, w:12, h:0.4, fontSize:14, color:C.accent, fontFace:FONT, bold:true });
+    c2.addText(`這 ${DUR} 分鐘的安排`, { x:0.5, y:0.7, w:12, h:0.7, fontSize:30, color:C.ink, fontFace:FONT, bold:true });
+    c2.addText('今天會聊：' + topics.map(t=>t.ico+' '+t.n).join('   '), { x:0.5, y:1.5, w:12, h:0.5, fontSize:12, color:C.muted, fontFace:FONT });
+    [['01','先聊聊整體主軸','為什麼把這些主題放在一起、它們怎麼串起來',M[0]],
+     ['02','精選亮點','從各主題挑出最有感、最實用的功能一次看',M[1]],
+     ['03','🙌 換您試試看','挑幾個重點實際動手操作',M[2]],
+     ['04','生活應用情境','看看在各種情境怎麼搭著用',M[3]],
+     ['05','快速上手','整理成可以帶回家的重點步驟',M[4]],
+     ['06','配件搭配 + Q&A','常見搭配選擇、現場回答疑問',M[5]]].forEach((it,i)=>{
+      const y = 2.1 + i*0.82;
+      c2.addText(it[0], { x:0.5, y:y, w:0.6, h:0.6, fontSize:22, color:C.accent, fontFace:FONT, bold:true });
+      c2.addText(it[1], { x:1.2, y:y, w:8, h:0.4, fontSize:15, color:C.ink, fontFace:FONT, bold:true });
+      c2.addText(it[2], { x:1.2, y:y+0.38, w:8.5, h:0.3, fontSize:11, color:C.muted, fontFace:FONT });
+      c2.addText(it[3]+' 分鐘', { x:11, y:y+0.1, w:1.8, h:0.4, fontSize:12, color:C.accent, fontFace:FONT, bold:true, align:'right' });
+    });
+
+    // 整體主軸（列出每個主題）
+    const c3 = pptx.addSlide();
+    c3.background = { color: 'FFF7ED' };
+    c3.addText('先聊聊', { x:0.5, y:0.3, w:12, h:0.4, fontSize:14, color:C.warm, fontFace:FONT, bold:true });
+    c3.addText(title, { x:0.5, y:0.7, w:12, h:0.8, fontSize:28, color:C.ink, fontFace:FONT, bold:true });
+    c3.addText('這幾個主題乍看各自獨立，其實是同一段生活的不同面向：', { x:0.5, y:1.6, w:12, h:0.4, fontSize:13, color:C.muted, fontFace:FONT });
+    topics.forEach((t,i)=>{
+      const x = 0.5 + (i%2)*6.3, y = 2.2 + Math.floor(i/2)*0.95;
+      c3.addText(t.ico, { x:x, y:y, w:0.7, h:0.6, fontSize:26, fontFace:FONT });
+      c3.addText(t.n, { x:x+0.8, y:y, w:5.2, h:0.4, fontSize:15, color:C.ink, fontFace:FONT, bold:true });
+      c3.addText(t.tagline || t.sub || '', { x:x+0.8, y:y+0.38, w:5.2, h:0.45, fontSize:10, color:'555555', fontFace:FONT });
+    });
+
+    // 精選亮點（每 3 個一頁，跨主題打散）
+    const hChunks = chunk(highlights, 3);
+    hChunks.forEach((ch, pi)=>{
+      const part = hChunks.length>1 ? `（${pi+1}/${hChunks.length}）` : '';
+      const sh = pptx.addSlide();
+      sh.background = { color: 'FFFFFF' };
+      sh.addText('精選亮點'+part, { x:0.5, y:0.3, w:12, h:0.4, fontSize:14, color:C.accent, fontFace:FONT, bold:true });
+      sh.addText(`值得一看的功能${part}`, { x:0.5, y:0.7, w:12, h:0.8, fontSize:30, color:C.ink, fontFace:FONT, bold:true });
+      ch.forEach((f,i)=>{
+        const y = 1.8 + i*1.7;
+        sh.addText(String(pi*3+i+1).padStart(2,'0'), { x:0.5, y:y, w:0.8, h:1.4, fontSize:42, color:C.accent, fontFace:FONT, bold:true });
+        sh.addText(`${f.fi} ${f.ft}`, { x:1.5, y:y, w:11, h:0.5, fontSize:18, color:C.ink, fontFace:FONT, bold:true });
+        sh.addText(f.fd + `\n📦 來自：${f.topic.ico} ${f.topic.n}`, { x:1.5, y:y+0.55, w:11, h:1.1, fontSize:13, color:'555555', fontFace:FONT, valign:'top' });
+      });
+    });
+
+    // 動手實作
+    const c6 = pptx.addSlide();
+    c6.background = { color: 'FFF7ED' };
+    c6.addText('🙌 動手實作時間', { x:0.5, y:0.3, w:12, h:0.4, fontSize:14, color:C.warm, fontFace:FONT, bold:true });
+    c6.addText(`換您試試看 · ${M[2]} 分鐘實機體驗`, { x:0.5, y:0.7, w:12, h:0.8, fontSize:28, color:C.ink, fontFace:FONT, bold:true });
+    const fhEach = Math.round(M[2]/3), fhMins = [fhEach, fhEach, M[2]-fhEach*2];
+    featPool.slice(0,3).forEach((f,i)=>{
+      const y = 2.0 + i*1.65;
+      c6.addText(String(i+1).padStart(2,'0'), { x:0.5, y:y, w:0.8, h:1.2, fontSize:36, color:C.warm, fontFace:FONT, bold:true });
+      c6.addText(`試試 ${f.topic.ico}「${f.ft.replace(/[—·].*/,'').trim()}」`, { x:1.5, y:y, w:9, h:0.5, fontSize:16, color:C.ink, fontFace:FONT, bold:true });
+      c6.addText(`【來自 ${f.topic.n}】${f.fd}`, { x:1.5, y:y+0.5, w:9.5, h:1.0, fontSize:11, color:'555555', fontFace:FONT, valign:'top' });
+      c6.addText(`⏱ ${fhMins[i]} 分鐘`, { x:11, y:y+0.2, w:1.8, h:0.5, fontSize:12, color:C.warm, fontFace:FONT, bold:true, align:'right' });
+    });
+
+    // 生活情境（跨主題挑 4 個）
+    const c7 = pptx.addSlide();
+    c7.background = { color: 'FFFFFF' };
+    c7.addText('融入您的日常', { x:0.5, y:0.3, w:12, h:0.4, fontSize:14, color:C.accent, fontFace:FONT, bold:true });
+    c7.addText('日常裡會遇到的時刻', { x:0.5, y:0.7, w:12, h:0.8, fontSize:28, color:C.ink, fontFace:FONT, bold:true });
+    scnPool.slice(0,4).forEach((sc,i)=>{
+      const x = 0.5 + (i%2)*6.3, y = 1.9 + Math.floor(i/2)*2.7;
+      c7.addText(sc.i, { x:x, y:y, w:0.8, h:0.7, fontSize:32, fontFace:FONT });
+      c7.addText(`${sc.topic.ico} ${sc.t}`, { x:x+0.9, y:y, w:5, h:0.5, fontSize:16, color:C.ink, fontFace:FONT, bold:true });
+      c7.addText(sc.d, { x:x+0.9, y:y+0.55, w:5, h:1.8, fontSize:12, color:'555555', fontFace:FONT, valign:'top' });
+    });
+
+    // 快速上手（跨主題抽 5 個重點）
+    const c8 = pptx.addSlide();
+    c8.background = { color: 'FFFFFF' };
+    c8.addText('快速上手', { x:0.5, y:0.3, w:12, h:0.4, fontSize:14, color:C.accent, fontFace:FONT, bold:true });
+    c8.addText('五個重點，記得就好', { x:0.5, y:0.7, w:12, h:0.8, fontSize:28, color:C.ink, fontFace:FONT, bold:true });
+    featPool.slice(0,5).forEach((f,i)=>{
+      const y = 1.9 + i*0.95;
+      c8.addText(String(i+1).padStart(2,'0'), { x:0.5, y:y, w:0.6, h:0.6, fontSize:22, color:C.accent, fontFace:FONT, bold:true });
+      c8.addText(`${f.fi} ${f.ft.replace(/[—·].*/,'').trim()}`, { x:1.2, y:y, w:9, h:0.45, fontSize:15, color:C.ink, fontFace:FONT, bold:true });
+      c8.addText(`來自 ${f.topic.n}`, { x:1.2, y:y+0.42, w:9, h:0.3, fontSize:11, color:C.muted, fontFace:FONT });
+    });
+
+    // 配件搭配（跨主題挑最多 6 款）+ 收尾
+    const c9 = pptx.addSlide();
+    c9.background = { color: C.dark };
+    c9.addText('搭配的小東西', { x:0.5, y:0.3, w:12, h:0.4, fontSize:14, color:'FB7185', fontFace:FONT, bold:true });
+    c9.addText('幾個會用到的小幫手', { x:0.5, y:0.7, w:12, h:0.7, fontSize:28, color:'FFFFFF', fontFace:FONT, bold:true });
+    accPool.slice(0,6).forEach((ac,i)=>{
+      const x = 0.5 + (i%3)*4.2, y = 1.7 + Math.floor(i/3)*1.5;
+      c9.addText(`${ac.topic.ico} ${ac.i} ${ac.n}`, { x:x, y:y, w:3.9, h:0.5, fontSize:14, color:'FFFFFF', fontFace:FONT, bold:true });
+      c9.addText(`${ac.p}`, { x:x, y:y+0.5, w:3.9, h:0.4, fontSize:11, color:'FB7185', fontFace:FONT });
+      c9.addText(`💬 ${ac.why}`, { x:x, y:y+0.9, w:3.9, h:0.55, fontSize:10, color:'FFFFFF', fontFace:FONT, italic:true, valign:'top' });
+    });
+    c9.addText('🙏 謝謝您今天的參與，下次小教室再見！', { x:0.5, y:6.6, w:12, h:0.5, fontSize:15, color:'FFFFFF', fontFace:FONT, bold:true });
+  }
+
+  if(topicList.length === 1){
+    ageList.forEach(a=>pptxSingle(topicList[0], a));
+  } else {
+    ageList.forEach(a=>pptxFused(topicList, a));
+  }
 
   const dateStr = ($('#date').value || new Date().toISOString().slice(0,10)).replace(/\//g,'-');
   const topicStr = [...SELECTED_T].map(i=>TOPICS[i].n).join('+');
@@ -2860,6 +2961,7 @@ function getSmartTitle(topics){
 
 function generate(){
   const dur = +$('#dur').value || 60;
+  DUR = dur;
   $('#mDate').textContent = $('#date').value || '—';
   $('#mDur').textContent = dur;
   $('#mPpl').textContent = $('#ppl').value || '—';
@@ -2872,21 +2974,26 @@ function generate(){
   const ageList = [...SELECTED_A].map(i=>AGES[i]);
 
   if(topicList.length === 1){
-    /* 單一主題 — 沿用原本 9 頁完整流程 */
+    /* 單一主題 — 封面/地圖/定位 + 核心功能(每3個一頁) + 實作/情境/進階/快速/功課/配件 */
     const combos = [];
     ageList.forEach(a=>combos.push([topicList[0], a]));
-    const total = combos.length * 11;
+    const featChunks = chunk(topicList[0].features, 3);
+    const perDeck = 9 + featChunks.length;      // 每個年齡層一份的頁數
+    const total = combos.length * perDeck;       // 多年齡層時連續編號
     let p = 0;
     combos.forEach(([t,a])=>{
       SLIDES.push(buildCover(t, a, ++p, total));
       SLIDES.push(buildAgenda(t, a, ++p, total));
       SLIDES.push(buildWhy(t, a, ++p, total));
-      SLIDES.push(buildFeaturesA(t, a, ++p, total));
-      SLIDES.push(buildFeaturesB(t, a, ++p, total));
+      let start = 0;
+      featChunks.forEach((ch,i)=>{
+        SLIDES.push(buildFeaturesPage(t, a, ch, start, i, featChunks.length, ++p, total));
+        start += ch.length;
+      });
       SLIDES.push(buildHandsOn(t, a, ++p, total));
       SLIDES.push(buildScenarios(t, a, ++p, total));
-      SLIDES.push(buildQuickStart(t, a, ++p, total));
       SLIDES.push(buildHandbook(t, a, ++p, total));
+      SLIDES.push(buildQuickStart(t, a, ++p, total));
       SLIDES.push(buildHomework(t, a, ++p, total));
       SLIDES.push(buildAccessories(t, a, ++p, total));
     });
@@ -2915,9 +3022,9 @@ function generate(){
 /* ============================================
    🔀 多主題融合模式 — 智慧融合成「一場主題式講座」
    不再一個產品一頁，而是依選取主題的共同主軸（getSmartTitle）
-   把所有亮點/情境/配件跨主題打散重組，固定產出約 11 頁。
-   頁面：封面→學習地圖→整體主軸→精選亮點×3→動手實作→
-        生活情境→快速上手→配件搭配→收尾
+   把所有亮點/情境/配件跨主題打散重組。
+   頁面：封面→學習地圖→整體主軸→精選亮點×N（隨主題數動態，每頁3個，
+        保證每個主題至少露出一頁）→動手實作→生活情境→快速上手→配件搭配→收尾
    ============================================ */
 /* 跨主題輪流取材，讓多主題融合時各產品平均出現 */
 function roundRobin(topics, key){
@@ -2930,26 +3037,36 @@ function roundRobin(topics, key){
   return out;
 }
 function buildFusedDeck(topics, age){
-  const total = 11;
   const title = getSmartTitle(topics);
   const featPool = roundRobin(topics, 'features');
   const scnPool  = roundRobin(topics, 'scenarios');
   const accPool  = roundRobin(topics, 'accessories');
-  const highlights = featPool.slice(0, 9);
+  /* 精選亮點：roundRobin 的前 N 筆 = 每個選到主題的「首個功能」。
+     取 want = max(主題數, 9) 但不超過功能總數 → 保證「每個主題至少有一頁亮點」，
+     主題少時仍多帶幾個功能讓內容豐富。亮點頁數隨功能數動態（每頁 3 個），
+     不再固定 3 頁/9 個而把後面的主題整個丟掉（修正大綱有標題、內容卻沒那頁的問題）。 */
+  const want = Math.min(featPool.length, Math.max(topics.length, 9));
+  const highlights = featPool.slice(0, want);
+  const hlPages = Math.max(1, Math.ceil(highlights.length / 3));
+  const total = 8 + hlPages; // 封面/地圖/主軸 + 亮點×hlPages + 動手/情境/快速上手/配件/收尾
   let p = 0;
-  return [
+  const deck = [
     buildFusedCover(topics, age, ++p, total),
     buildFusedAgenda(topics, age, ++p, total),
-    buildFusedOverview(topics, age, title, ++p, total),
-    buildFusedHighlights(highlights, 0, '精選亮點（上）', ++p, total),
-    buildFusedHighlights(highlights, 1, '精選亮點（中）', ++p, total),
-    buildFusedHighlights(highlights, 2, '精選亮點（下）', ++p, total),
+    buildFusedOverview(topics, age, title, ++p, total)
+  ];
+  for(let g = 0; g < hlPages; g++){
+    const label = hlPages > 1 ? `精選亮點（${g+1}/${hlPages}）` : '精選亮點';
+    deck.push(buildFusedHighlights(highlights, g, label, ++p, total));
+  }
+  deck.push(
     buildFusedHandsOn(topics, featPool, ++p, total),
     buildFusedScenarios(topics, scnPool, ++p, total),
     buildFusedQuickAdv(topics, featPool, ++p, total),
     buildFusedAccessories(topics, accPool, ++p, total),
     buildFusedClosing(topics, age, ++p, total)
-  ];
+  );
+  return deck;
 }
 
 /* —— 融合・總封面 —— */
@@ -2972,26 +3089,27 @@ function buildFusedCover(topics, age, pNum, tNum){
       </div>
       <div class="cover-tags">
         <span>✨ ${topics.length} 個主題一起聊</span>
-        <span>⏱ 約 60 分鐘</span>
+        <span>⏱ 約 ${DUR} 分鐘</span>
         <span>🙌 含實際操作時間</span>
       </div>
     </div>
     <div class="foot">
       <div>Apple Shop 小教室 · 顧客體驗分享</div>
-      <div>第 1 站 · 歡迎開場</div>
+      <div>第 ${pNum} 站 · 歡迎開場</div>
     </div>
   </div>`;
 }
 
 /* —— 融合・學習地圖（主題式流程 + 今天會聊到的主題） —— */
 function buildFusedAgenda(topics, age, pNum, tNum){
+  const M = planMinutes(DUR);
   const items = [
-    {n:"01", t:"先聊聊整體主軸", d:"為什麼把這些主題放在一起，它們在生活裡怎麼串起來", time:"5 分鐘"},
-    {n:"02", t:"精選亮點", d:"從這幾個主題裡挑出最有感、最實用的功能一次看", time:"20 分鐘"},
-    {n:"03", t:"換您試試看", d:"挑幾個重點實際動手操作，看看搭著用是什麼感覺", time:"15 分鐘"},
-    {n:"04", t:"生活應用情境", d:"看看在工作、家庭、娛樂、出門各種情境怎麼用", time:"10 分鐘"},
-    {n:"05", t:"快速上手", d:"幫您整理成可以帶回家的重點步驟", time:"7 分鐘"},
-    {n:"06", t:"配件搭配 + Q&A", d:"幾個常見的搭配選擇、現場聊聊您想知道的", time:"3 分鐘"}
+    {n:"01", t:"先聊聊整體主軸", d:"為什麼把這些主題放在一起，它們在生活裡怎麼串起來", time:M[0]+" 分鐘"},
+    {n:"02", t:"精選亮點", d:"從這幾個主題裡挑出最有感、最實用的功能一次看", time:M[1]+" 分鐘"},
+    {n:"03", t:"換您試試看", d:"挑幾個重點實際動手操作，看看搭著用是什麼感覺", time:M[2]+" 分鐘"},
+    {n:"04", t:"生活應用情境", d:"看看在工作、家庭、娛樂、出門各種情境怎麼用", time:M[3]+" 分鐘"},
+    {n:"05", t:"快速上手", d:"幫您整理成可以帶回家的重點步驟", time:M[4]+" 分鐘"},
+    {n:"06", t:"配件搭配 + Q&A", d:"幾個常見的搭配選擇、現場聊聊您想知道的", time:M[5]+" 分鐘"}
   ];
   const strip = topics.map(t=>`<span style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,113,227,.08);border:1px solid rgba(0,113,227,.18);border-radius:980px;padding:6px 14px;font-size:13px;font-weight:600;margin:0 7px 8px 0"><span style="font-size:16px">${t.ico}</span>${t.n}</span>`).join('');
   return `<div class="slide light">
@@ -3001,7 +3119,7 @@ function buildFusedAgenda(topics, age, pNum, tNum){
     </div>
     <div class="slide-hd">
       <div class="label">今天會聊什麼</div>
-      <div class="title">這 60 分鐘的安排</div>
+      <div class="title">這 ${DUR} 分鐘的安排</div>
       <div class="sub">不會一個產品講一遍，而是把這些主題的精華融在一起，看它們在生活裡怎麼搭。</div>
     </div>
     <div class="rule"></div>
@@ -3020,7 +3138,7 @@ function buildFusedAgenda(topics, age, pNum, tNum){
     </div>
 
     <div class="foot">
-      <div>第 2 站 · 今日學習地圖</div>
+      <div>第 ${pNum} 站 · 今日學習地圖</div>
       <div>Apple Shop · 感謝您的參與</div>
     </div>
   </div>`;
@@ -3055,7 +3173,7 @@ function buildFusedOverview(topics, age, title, pNum, tNum){
     <div class="features features-single">${cards}</div>
 
     <div class="foot">
-      <div>第 3 站 · 整體主軸</div>
+      <div>第 ${pNum} 站 · 整體主軸</div>
       <div>Apple Shop · 感謝您的參與</div>
     </div>
   </div>`;
@@ -3097,12 +3215,15 @@ function buildFusedHighlights(highlights, group, label, pNum, tNum){
 
 /* —— 融合・動手實作（跨主題挑 3 個功能練習） —— */
 function buildFusedHandsOn(topics, featPool, pNum, tNum){
+  const hm = planMinutes(DUR)[2];
+  const each = Math.round(hm/3);
+  const taskMins = [each, each, hm-each*2];
   const picks = featPool.slice(0,3);
   const tasks = picks.map((f,i)=>({
     n:String(i+1).padStart(2,'0'),
-    t:`試試 ${f.topic.ico}「${f.ft.replace(/[—,，·].*/,'').trim()}」`,
-    d:`來自 ${f.topic.n}，跟著示範實際操作一次。`,
-    time:"5 分鐘",
+    t:`試試 ${f.topic.ico}「${f.ft.replace(/[—·].*/,'').trim()}」`,
+    d:`【來自 ${f.topic.n}】${f.fd}`,
+    time:taskMins[i]+" 分鐘",
     steps:["先看一次完整操作流程","換您自己從頭試一次","想想看您日常哪些時候會用到"]
   }));
   return `<div class="slide warm">
@@ -3112,7 +3233,7 @@ function buildFusedHandsOn(topics, featPool, pNum, tNum){
     </div>
     <div class="slide-hd">
       <div class="label">換您試試看</div>
-      <div class="title">動手試 15 分鐘</div>
+      <div class="title">動手試 ${hm} 分鐘</div>
       <div class="sub">不會操作沒關係，慢慢來，有問題隨時提出來。</div>
     </div>
     <div class="rule"></div>
@@ -3143,7 +3264,7 @@ function buildFusedHandsOn(topics, featPool, pNum, tNum){
 
 /* —— 融合・快速上手（跨主題抽 5 個重點整理成回家清單） —— */
 function buildFusedQuickAdv(topics, featPool, pNum, tNum){
-  const steps = featPool.slice(0,5).map((f,i)=>({ n:String(i+1).padStart(2,'0'), t:`${f.fi} ${f.ft.replace(/[—,，·].*/,'').trim()}`, src:f.topic.n }));
+  const steps = featPool.slice(0,5).map((f,i)=>({ n:String(i+1).padStart(2,'0'), t:`${f.fi} ${f.ft.replace(/[—·].*/,'').trim()}`, src:f.topic.n }));
   return `<div class="slide light">
     <div class="chrome">
       <div>快速上手</div>
@@ -3263,7 +3384,7 @@ function buildFusedClosing(topics, age, pNum, tNum){
     <div class="slide-hd">
       <div class="label">今天的總結</div>
       <div class="title">謝謝您今天的參與 🙏</div>
-      <div class="sub">希望這 60 分鐘，讓您對這些主題更有感。</div>
+      <div class="sub">希望這 ${DUR} 分鐘，讓您對這些主題更有感。</div>
     </div>
     <div class="rule"></div>
 
@@ -3283,7 +3404,7 @@ function buildFusedClosing(topics, age, pNum, tNum){
     </div>
 
     <div class="foot">
-      <div>最終站 · 收尾</div>
+      <div>第 ${pNum} 站 · 收尾</div>
       <div>Apple Shop · 感謝您的參與</div>
     </div>
   </div>`;
@@ -3943,7 +4064,7 @@ function renderSocial(){
   const ppl=$('#ppl').value;
   const ageStr=ages.length?ages.map(a=>a.k).join('、'):'';
   const topicLines=topics.map(t=>t.ico+' '+t.n).join('\n');
-  const bullets=topics.slice(0,3).map(t=>'✓ '+t.features[0].ft.replace(/[—,，·].*/,'').trim()).join('\n');
+  const bullets=topics.slice(0,3).map(t=>'✓ '+t.features[0].ft.replace(/[—·].*/,'').trim()).join('\n');
   const hashtags='#'+store.replace(/\s/g,'')+' #Apple小教室 '+topics.slice(0,3).map(t=>'#'+t.n.split(/[\s·]/)[0]).join(' ');
   const info=[date?('🗓 '+date):'', '⏱ 約 '+dur+' 分鐘', ppl?('👥 限額 '+ppl+' 位'):''].filter(Boolean).join('　');
 
