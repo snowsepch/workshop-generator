@@ -1805,11 +1805,14 @@ const TOPICS = [
 ];
 
 const AGES = [
-  {k:"兒童", en:"6-12 歲", tone:"活潑、故事、遊戲化", focus:"創造力與安全使用", pitch:"<b>輕鬆好上手、安全有保障。</b>用孩子聽得懂的方式介紹，重點放在好操作、安全使用，並激發創造力。建議家長陪伴一起學習。"},
-  {k:"青少年", en:"13-18 歲", tone:"潮流、創作、社群感", focus:"創作與自我表達", pitch:"<b>創作、分享、找到屬於自己的風格。</b>圍繞拍照、剪片、社群分享的場景，幫助您打造個人風格，玩出更多可能。"},
-  {k:"上班族", en:"19-45 歲", tone:"專業、效率、實用", focus:"效率與整合", pitch:"<b>節省時間、提升效率、整合工作流程。</b>聚焦在實用功能、跨裝置整合，讓您的工作流程變得更順手、更有效率。"},
-  {k:"家長族群", en:"30-55 歲", tone:"安心、清楚、家庭場景", focus:"家庭管理與整合", pitch:"<b>家庭共享、孩子安全、生活更從容。</b>從家庭場景出發，強調共用、管理、隨時與家人保持聯繫，讓家庭生活更輕鬆。"},
-  {k:"銀髮族", en:"55+ 歲", tone:"溫和、清楚、慢節奏", focus:"輕鬆使用與聯繫家人", pitch:"<b>清楚易懂、步調放慢、與家人保持聯繫。</b>步驟講解放慢、字級放大，重點放在好上手的功能、健康關懷，以及與兒孫聯繫的方式。"}
+  {k:"青少年", en:"13-18 歲", tone:"潮流、創作、社群感", focus:"創作與自我表達", pitch:"<b>創作、分享、找到屬於自己的風格。</b>圍繞拍照、剪片、社群分享的場景，幫助您打造個人風格，玩出更多可能。",
+    hook:"為想玩創作、愛分享的你準備", agendaNote:"今天會多聊拍照、剪片、社群分享這些好玩的應用，邊學邊試，找到屬於你的風格。", handsNote:"別怕亂試，創作就是玩出來的，卡住了隨時問。", closeNote:"把今天學到的拿去拍、去剪、去分享，玩出你的風格。"},
+  {k:"上班族", en:"19-45 歲", tone:"專業、效率、實用", focus:"效率與整合", pitch:"<b>節省時間、提升效率、整合工作流程。</b>聚焦在實用功能、跨裝置整合，讓您的工作流程變得更順手、更有效率。",
+    hook:"為講求效率、想把工具用好的您準備", agendaNote:"今天聚焦實用、能省時間的功能，以及跨裝置整合，讓您的工作流程更順。", handsNote:"挑跟您工作最相關的先試，有問題隨時提出來。", closeNote:"挑一兩個今天就導入您的工作流程，會越用越順手。"},
+  {k:"家長族群", en:"30-55 歲", tone:"安心、清楚、家庭場景", focus:"家庭管理與整合", pitch:"<b>家庭共享、孩子安全、生活更從容。</b>從家庭場景出發，強調共用、管理、隨時與家人保持聯繫，讓家庭生活更輕鬆。",
+    hook:"為重視家庭、想用得安心的您準備", agendaNote:"今天從家庭場景出發，聊共用、管理、隨時和家人保持聯繫，讓生活更從容。", handsNote:"可以想著家裡的情境一起試，有問題隨時問。", closeNote:"把今天的功能用在家庭生活裡，和家人一起更省心。"},
+  {k:"銀髮族", en:"55+ 歲", tone:"溫和、清楚、慢節奏", focus:"輕鬆使用與聯繫家人", pitch:"<b>清楚易懂、步調放慢、與家人保持聯繫。</b>步驟講解放慢、字級放大，重點放在好上手的功能、健康關懷，以及與兒孫聯繫的方式。",
+    hook:"為想輕鬆上手、和家人保持聯繫的您準備", agendaNote:"今天步調會放慢、字也看得清楚，重點放在好上手的功能，還有怎麼和兒孫聯繫。", handsNote:"不用急，慢慢來，一個步驟一個步驟跟著做，不會就問，我們一步步帶您。", closeNote:"挑一個今天就試試，下次回來我們再一起練。"}
 ];
 
 let SELECTED_T = new Set();
@@ -1899,7 +1902,7 @@ function buildCover(topic, age, pNum, tNum){
       </div>
       <div class="cover-tags">
         <span>✨ ${topic.tagline}</span>
-        <span>🎯 為您準備的內容</span>
+        <span>🎯 ${age.hook}</span>
         <span>⏱ 約 ${DUR} 分鐘</span>
         <span>🙌 含實際操作時間</span>
       </div>
@@ -1958,7 +1961,7 @@ function buildAgenda(topic, age, pNum, tNum){
 
     <div class="pitch-card blue" style="margin-bottom:0">
       <div class="pl">📌 小提醒</div>
-      <div class="pt">過程中有任何疑問都可以隨時問。如果您是從其他品牌轉過來，今天會帶您慢慢上手；如果您已經是 Apple 用戶，今天會聊到一些您可能還不知道的小技巧。</div>
+      <div class="pt">${age.agendaNote} 過程中有任何疑問都可以隨時問，不用客氣。</div>
     </div>
 
     <div class="foot">
@@ -2123,7 +2126,7 @@ function buildHandsOn(topic, age, pNum, tNum){
     <div class="slide-hd">
       <div class="label">換您試試看</div>
       <div class="title">${topic.n} · 動手試 ${hm} 分鐘</div>
-      <div class="sub">不會操作沒關係，慢慢來就好，有問題隨時提出來。</div>
+      <div class="sub">${age.handsNote}</div>
     </div>
     <div class="rule"></div>
 
@@ -2447,7 +2450,7 @@ function buildHomework(topic, age, pNum, tNum){
     <div class="slide-hd">
       <div class="label">回家後</div>
       <div class="title">${topic.n} · 三個小功課試試</div>
-      <div class="sub">不用全做，挑一個今天就試。慢慢來，下次回來再聊聊使用心得。</div>
+      <div class="sub">${age.closeNote}不用全做，挑一個今天就試。</div>
     </div>
     <div class="rule"></div>
 
@@ -2638,7 +2641,7 @@ function downloadPptx(){
     s1.addText(t.n, { x:0.5, y:2.7, w:12, h:1.2, fontSize:52, color:'FFFFFF', fontFace:FONT, bold:true });
     s1.addText(t.sub, { x:0.5, y:4.0, w:12, h:0.6, fontSize:20, color:'FFFFFF', fontFace:FONT });
     s1.addText(t.welcome, { x:0.5, y:5.0, w:12, h:1.5, fontSize:14, color:'FFFFFF', fontFace:FONT, valign:'top', fill:{ color:'FFFFFF', transparency:88 } });
-    s1.addText(`✨ ${t.tagline}    🎯 為您客製的內容    ⏱ 約 ${DUR} 分鐘`, { x:0.5, y:6.8, w:12, h:0.4, fontSize:12, color:'FFFFFF', fontFace:FONT });
+    s1.addText(`✨ ${t.tagline}    🎯 ${a.hook}    ⏱ 約 ${DUR} 分鐘`, { x:0.5, y:6.8, w:12, h:0.4, fontSize:12, color:'FFFFFF', fontFace:FONT });
 
     // 今日學習地圖
     const s2 = pptx.addSlide();
@@ -2698,7 +2701,7 @@ function downloadPptx(){
     s6.background = { color: 'FFF7ED' };
     s6.addText('🙌 動手實作時間', { x:0.5, y:0.3, w:12, h:0.4, fontSize:14, color:C.warm, fontFace:FONT, bold:true });
     s6.addText(`換您試試看 · ${M[2]} 分鐘實機體驗`, { x:0.5, y:0.7, w:12, h:0.8, fontSize:28, color:C.ink, fontFace:FONT, bold:true });
-    s6.addText('講師會逐桌協助，請放心嘗試。', { x:0.5, y:1.5, w:12, h:0.4, fontSize:14, color:C.muted, fontFace:FONT });
+    s6.addText(a.handsNote, { x:0.5, y:1.5, w:12, h:0.4, fontSize:14, color:C.muted, fontFace:FONT });
     const hEach = Math.round(M[2]/3), hMins = [hEach, hEach, M[2]-hEach*2];
     [[`認識並開啟「${t.features[0].ft.replace(/[—·].*/,'').trim()}」`, t.features[0].fd, hMins[0]+' 分鐘'],
      [`親手體驗「${(t.features[2]||t.features[t.features.length-1]).ft.replace(/[—·].*/,'').trim()}」`, (t.features[2]||t.features[t.features.length-1]).fd, hMins[1]+' 分鐘'],
@@ -2772,7 +2775,7 @@ function downloadPptx(){
     c1.addText('小教室分享 · 主題式講座', { x:0.5, y:2.1, w:12, h:0.4, fontSize:14, color:'93C5FD', fontFace:FONT, bold:true });
     c1.addText(title, { x:0.5, y:2.6, w:12, h:1.2, fontSize:46, color:'FFFFFF', fontFace:FONT, bold:true });
     c1.addText(`今天把 ${topics.length} 個有關聯的主題放在一起聊，看它們在生活裡怎麼搭起來、讓日子更順手。`, { x:0.5, y:4.2, w:12, h:1.4, fontSize:14, color:'FFFFFF', fontFace:FONT, valign:'top', fill:{ color:'FFFFFF', transparency:88 } });
-    c1.addText(`✨ ${topics.length} 個主題一起聊    🙌 含實際操作時間    ⏱ 約 ${DUR} 分鐘`, { x:0.5, y:6.8, w:12, h:0.4, fontSize:12, color:'FFFFFF', fontFace:FONT });
+    c1.addText(`✨ ${topics.length} 個主題一起聊    🎯 ${a.hook}    ⏱ 約 ${DUR} 分鐘`, { x:0.5, y:6.8, w:12, h:0.4, fontSize:12, color:'FFFFFF', fontFace:FONT });
 
     // 今日學習地圖
     const c2 = pptx.addSlide();
@@ -2827,6 +2830,7 @@ function downloadPptx(){
     c6.background = { color: 'FFF7ED' };
     c6.addText('🙌 動手實作時間', { x:0.5, y:0.3, w:12, h:0.4, fontSize:14, color:C.warm, fontFace:FONT, bold:true });
     c6.addText(`換您試試看 · ${M[2]} 分鐘實機體驗`, { x:0.5, y:0.7, w:12, h:0.8, fontSize:28, color:C.ink, fontFace:FONT, bold:true });
+    c6.addText(a.handsNote, { x:0.5, y:1.5, w:12, h:0.4, fontSize:13, color:C.muted, fontFace:FONT });
     const fhEach = Math.round(M[2]/3), fhMins = [fhEach, fhEach, M[2]-fhEach*2];
     featPool.slice(0,3).forEach((f,i)=>{
       const y = 2.0 + i*1.65;
@@ -3060,7 +3064,7 @@ function buildFusedDeck(topics, age){
     deck.push(buildFusedHighlights(highlights, g, label, ++p, total));
   }
   deck.push(
-    buildFusedHandsOn(topics, featPool, ++p, total),
+    buildFusedHandsOn(topics, featPool, age, ++p, total),
     buildFusedScenarios(topics, scnPool, ++p, total),
     buildFusedQuickAdv(topics, featPool, ++p, total),
     buildFusedAccessories(topics, accPool, ++p, total),
@@ -3089,6 +3093,7 @@ function buildFusedCover(topics, age, pNum, tNum){
       </div>
       <div class="cover-tags">
         <span>✨ ${topics.length} 個主題一起聊</span>
+        <span>🎯 ${age.hook}</span>
         <span>⏱ 約 ${DUR} 分鐘</span>
         <span>🙌 含實際操作時間</span>
       </div>
@@ -3120,7 +3125,7 @@ function buildFusedAgenda(topics, age, pNum, tNum){
     <div class="slide-hd">
       <div class="label">今天會聊什麼</div>
       <div class="title">這 ${DUR} 分鐘的安排</div>
-      <div class="sub">不會一個產品講一遍，而是把這些主題的精華融在一起，看它們在生活裡怎麼搭。</div>
+      <div class="sub">${age.agendaNote}</div>
     </div>
     <div class="rule"></div>
 
@@ -3214,7 +3219,7 @@ function buildFusedHighlights(highlights, group, label, pNum, tNum){
 }
 
 /* —— 融合・動手實作（跨主題挑 3 個功能練習） —— */
-function buildFusedHandsOn(topics, featPool, pNum, tNum){
+function buildFusedHandsOn(topics, featPool, age, pNum, tNum){
   const hm = planMinutes(DUR)[2];
   const each = Math.round(hm/3);
   const taskMins = [each, each, hm-each*2];
@@ -3234,7 +3239,7 @@ function buildFusedHandsOn(topics, featPool, pNum, tNum){
     <div class="slide-hd">
       <div class="label">換您試試看</div>
       <div class="title">動手試 ${hm} 分鐘</div>
-      <div class="sub">不會操作沒關係，慢慢來，有問題隨時提出來。</div>
+      <div class="sub">${age.handsNote}</div>
     </div>
     <div class="rule"></div>
 
@@ -3394,8 +3399,8 @@ function buildFusedClosing(topics, age, pNum, tNum){
     </div>
 
     <div class="pitch-card">
-      <div class="pl">🙋 想問什麼隨時提</div>
-      <div class="pt">用一用之後若有疑問，隨時回門市問我們。也歡迎參加下一場小教室，主題不同，但都會幫到您。</div>
+      <div class="pl">🙋 帶回去試試</div>
+      <div class="pt">${age.closeNote}用一用之後若有疑問，隨時回門市問我們。也歡迎參加下一場小教室。</div>
     </div>
 
     <div class="pitch-card" style="margin-bottom:0">
